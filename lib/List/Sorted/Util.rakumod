@@ -4,29 +4,54 @@ use nqp;
 
 proto sub finds(|)   is export {*}
 proto sub inserts(|) is export {*}
+proto sub deletes(|) is export {*}
 
 #- start of generated part of str candidates ----------------------------------
-#- Generated on 2021-04-15T15:44:10+02:00 by ./makeNATIVES.raku
+#- Generated on 2021-04-15T19:12:37+02:00 by ./makeNATIVES.raku
 #- PLEASE DON'T CHANGE ANYTHING BELOW THIS LINE
+my str @insert_s;
+my str @delete_s;
+
 #-------------------------------------------------------------------------------
 # Publicly visible str candidates
 
-multi sub finds(str @a, Str:D $needle) {
+my multi sub finds(str @a, Str:D $needle) {
     nqp::islt_i((my int $i = finds_s(@a, $needle)),0)
       ?? Nil
       !! $i
 }
-multi sub finds(str @a, Str:D $needle, :&cmp!) {
+my multi sub finds(str @a, Str:D $needle, :&cmp!) {
     nqp::islt_i((my int $i = finds_s_cmp(@a, $needle, &cmp)),0)
       ?? Nil
       !! $i
 }
 
-multi sub inserts(str @a, Str:D $needle, :$force) {
+my multi sub inserts(str @a, Str:D $needle, :$force) {
     inserts_s(@a, $needle, finds_s(@a, $needle), $force.Bool)
 }
-multi sub inserts(str @a, Str:D $needle, :&cmp!, :$force) {
+my multi sub inserts(str @a, Str:D $needle, :&cmp!, :$force) {
     inserts_s(@a, $needle, finds_s_cmp(@a, $needle, &cmp), $force.Bool)
+}
+
+my multi sub deletes(str @a, Str:D $needle) {
+    nqp::if(
+      nqp::islt_i((my int $i = finds_s(@a, $needle)),0),
+      Nil,
+      nqp::stmts(
+        nqp::splice(@a,@delete_s,$i,1),
+        $needle
+      )
+    )
+}
+my multi sub deletes(str @a, Str:D $needle, :&cmp!) {
+    nqp::if(
+      nqp::islt_i((my int $i = finds_s_cmp(@a, $needle, &cmp)),0),
+      Nil,
+      nqp::stmts(
+        nqp::splice(@a,@delete_s,$i,1),
+        $needle
+      )
+    )
 }
 
 #-------------------------------------------------------------------------------
@@ -126,13 +151,11 @@ my sub finds_s_cmp(str @a, str $needle, &cmp) {
 }
 
 my sub inserts_s(str @a, str $needle, int $i, int $force) {
+    nqp::bindpos_s(@insert_s,0,$needle);
     nqp::if(
       nqp::islt_i($i,0),
       nqp::splice(                                      # not found
-        @a,
-        nqp::list_s($needle),
-        nqp::abs_i(nqp::add_i($i,1)),
-        0
+        @a,@insert_s,nqp::abs_i(nqp::add_i($i,1)),0
       ),
       nqp::if(                                          # found
         $force,
@@ -143,7 +166,7 @@ my sub inserts_s(str @a, str $needle, int $i, int $force) {
               && nqp::iseq_s($needle,nqp::atpos_s(@a,$j)),
             nqp::null
           ),
-          nqp::splice(@a,nqp::list_s($needle),$j,1)
+          nqp::splice(@a,@insert_s,$j,1)
         )
       )
     );
@@ -154,27 +177,51 @@ my sub inserts_s(str @a, str $needle, int $i, int $force) {
 #- end of generated part of str candidates ------------------------------------
 
 #- start of generated part of int candidates ----------------------------------
-#- Generated on 2021-04-15T15:44:10+02:00 by ./makeNATIVES.raku
+#- Generated on 2021-04-15T19:12:37+02:00 by ./makeNATIVES.raku
 #- PLEASE DON'T CHANGE ANYTHING BELOW THIS LINE
+my int @insert_i;
+my int @delete_i;
+
 #-------------------------------------------------------------------------------
 # Publicly visible int candidates
 
-multi sub finds(int @a, Int:D $needle) {
+my multi sub finds(int @a, Int:D $needle) {
     nqp::islt_i((my int $i = finds_i(@a, $needle)),0)
       ?? Nil
       !! $i
 }
-multi sub finds(int @a, Int:D $needle, :&cmp!) {
+my multi sub finds(int @a, Int:D $needle, :&cmp!) {
     nqp::islt_i((my int $i = finds_i_cmp(@a, $needle, &cmp)),0)
       ?? Nil
       !! $i
 }
 
-multi sub inserts(int @a, Int:D $needle, :$force) {
+my multi sub inserts(int @a, Int:D $needle, :$force) {
     inserts_i(@a, $needle, finds_i(@a, $needle), $force.Bool)
 }
-multi sub inserts(int @a, Int:D $needle, :&cmp!, :$force) {
+my multi sub inserts(int @a, Int:D $needle, :&cmp!, :$force) {
     inserts_i(@a, $needle, finds_i_cmp(@a, $needle, &cmp), $force.Bool)
+}
+
+my multi sub deletes(int @a, Int:D $needle) {
+    nqp::if(
+      nqp::islt_i((my int $i = finds_i(@a, $needle)),0),
+      Nil,
+      nqp::stmts(
+        nqp::splice(@a,@delete_i,$i,1),
+        $needle
+      )
+    )
+}
+my multi sub deletes(int @a, Int:D $needle, :&cmp!) {
+    nqp::if(
+      nqp::islt_i((my int $i = finds_i_cmp(@a, $needle, &cmp)),0),
+      Nil,
+      nqp::stmts(
+        nqp::splice(@a,@delete_i,$i,1),
+        $needle
+      )
+    )
 }
 
 #-------------------------------------------------------------------------------
@@ -274,13 +321,11 @@ my sub finds_i_cmp(int @a, int $needle, &cmp) {
 }
 
 my sub inserts_i(int @a, int $needle, int $i, int $force) {
+    nqp::bindpos_i(@insert_i,0,$needle);
     nqp::if(
       nqp::islt_i($i,0),
       nqp::splice(                                      # not found
-        @a,
-        nqp::list_i($needle),
-        nqp::abs_i(nqp::add_i($i,1)),
-        0
+        @a,@insert_i,nqp::abs_i(nqp::add_i($i,1)),0
       ),
       nqp::if(                                          # found
         $force,
@@ -291,7 +336,7 @@ my sub inserts_i(int @a, int $needle, int $i, int $force) {
               && nqp::iseq_s($needle,nqp::atpos_i(@a,$j)),
             nqp::null
           ),
-          nqp::splice(@a,nqp::list_i($needle),$j,1)
+          nqp::splice(@a,@insert_i,$j,1)
         )
       )
     );
@@ -302,27 +347,51 @@ my sub inserts_i(int @a, int $needle, int $i, int $force) {
 #- end of generated part of int candidates ------------------------------------
 
 #- start of generated part of num candidates ----------------------------------
-#- Generated on 2021-04-15T15:44:10+02:00 by ./makeNATIVES.raku
+#- Generated on 2021-04-15T19:12:37+02:00 by ./makeNATIVES.raku
 #- PLEASE DON'T CHANGE ANYTHING BELOW THIS LINE
+my num @insert_n;
+my num @delete_n;
+
 #-------------------------------------------------------------------------------
 # Publicly visible num candidates
 
-multi sub finds(num @a, Num:D $needle) {
+my multi sub finds(num @a, Num:D $needle) {
     nqp::islt_i((my int $i = finds_n(@a, $needle)),0)
       ?? Nil
       !! $i
 }
-multi sub finds(num @a, Num:D $needle, :&cmp!) {
+my multi sub finds(num @a, Num:D $needle, :&cmp!) {
     nqp::islt_i((my int $i = finds_n_cmp(@a, $needle, &cmp)),0)
       ?? Nil
       !! $i
 }
 
-multi sub inserts(num @a, Num:D $needle, :$force) {
+my multi sub inserts(num @a, Num:D $needle, :$force) {
     inserts_n(@a, $needle, finds_n(@a, $needle), $force.Bool)
 }
-multi sub inserts(num @a, Num:D $needle, :&cmp!, :$force) {
+my multi sub inserts(num @a, Num:D $needle, :&cmp!, :$force) {
     inserts_n(@a, $needle, finds_n_cmp(@a, $needle, &cmp), $force.Bool)
+}
+
+my multi sub deletes(num @a, Num:D $needle) {
+    nqp::if(
+      nqp::islt_i((my int $i = finds_n(@a, $needle)),0),
+      Nil,
+      nqp::stmts(
+        nqp::splice(@a,@delete_n,$i,1),
+        $needle
+      )
+    )
+}
+my multi sub deletes(num @a, Num:D $needle, :&cmp!) {
+    nqp::if(
+      nqp::islt_i((my int $i = finds_n_cmp(@a, $needle, &cmp)),0),
+      Nil,
+      nqp::stmts(
+        nqp::splice(@a,@delete_n,$i,1),
+        $needle
+      )
+    )
 }
 
 #-------------------------------------------------------------------------------
@@ -422,13 +491,11 @@ my sub finds_n_cmp(num @a, num $needle, &cmp) {
 }
 
 my sub inserts_n(num @a, num $needle, int $i, int $force) {
+    nqp::bindpos_n(@insert_n,0,$needle);
     nqp::if(
       nqp::islt_i($i,0),
       nqp::splice(                                      # not found
-        @a,
-        nqp::list_n($needle),
-        nqp::abs_i(nqp::add_i($i,1)),
-        0
+        @a,@insert_n,nqp::abs_i(nqp::add_i($i,1)),0
       ),
       nqp::if(                                          # found
         $force,
@@ -439,7 +506,7 @@ my sub inserts_n(num @a, num $needle, int $i, int $force) {
               && nqp::iseq_s($needle,nqp::atpos_n(@a,$j)),
             nqp::null
           ),
-          nqp::splice(@a,nqp::list_n($needle),$j,1)
+          nqp::splice(@a,@insert_n,$j,1)
         )
       )
     );

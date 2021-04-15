@@ -5,7 +5,7 @@ plan 3;
 
 subtest "finds on simple num list" =>  {
     my num @a = 1e0,3e0,5e0,7e0,9e0;
-    plan 2 * @a + 3;
+    plan 3 * @a + 4;
 
     for @a.kv -> $i, $number {
         is finds(@a, $number), $i, "did we find '$number'";
@@ -19,15 +19,26 @@ subtest "finds on simple num list" =>  {
     for 0e0,10e0,6e0 {
         is-deeply finds(@a, $_), Nil, "did we not find '$_'";
     }
+
+    for @a.clone.pick(*) {
+        is-deeply deletes(@a,$_), $_, "did '$_' get deleted";
+    }
+    is +@a, 0, 'Did we delete all elements';
 }
 
 subtest "finds on all nums from this file" => {
     my num @a = $?FILE.IO.comb(/\d+ e0/).map(*.Num).sort.squish;
-    plan +@a;
+    plan 2 * @a + 1;
 
     for @a.kv -> $i, $number {
         is finds(@a, $number), $i, "did we find '$number'";
     }
+
+    for @a.clone.pick(*) {
+        is-deeply deletes(@a,$_,:cmp(&[<=>])), $_,
+        "did '$_' get deleted with &[<=>]";
+    }
+    is +@a, 0, 'Did we delete all elements';
 }
 
 subtest "inserts on an empty num list" => {

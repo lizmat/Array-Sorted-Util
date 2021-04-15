@@ -3,9 +3,9 @@ use List::Sorted::Util;
 
 plan 3;
 
-subtest "finds on simple int list" =>  {
+subtest "finds / deletes on simple int list" =>  {
     my int @a = 1,3,5,7,9;
-    plan 2 * @a + 3;
+    plan 3 * @a + 4;
 
     for @a.kv -> $i, $number {
         is finds(@a, $number), $i, "did we find '$number'";
@@ -19,15 +19,26 @@ subtest "finds on simple int list" =>  {
     for 0,10,6 {
         is-deeply finds(@a, $_), Nil, "did we not find '$_'";
     }
+
+    for @a.clone.pick(*) {
+        is-deeply deletes(@a,$_), $_, "did '$_' get deleted";
+    }
+    is +@a, 0, 'Did we delete all elements';
 }
 
-subtest "finds on all ints from this file" => {
+subtest "finds / deletes on all ints from this file" => {
     my int @a = $?FILE.IO.comb(/\d+/).sort(*.Int).squish.map: *.Int;
-    plan +@a;
+    plan 2 * @a + 1;
 
     for @a.kv -> $i, $number {
         is finds(@a, $number), $i, "did we find '$number'";
     }
+
+    for @a.clone.pick(*) {
+        is-deeply deletes(@a,$_,:cmp(&[<=>])), $_,
+        "did '$_' get deletedi with &[<=>]";
+    }
+    is +@a, 0, 'Did we delete all elements';
 }
 
 subtest "inserts on an empty int list" => {

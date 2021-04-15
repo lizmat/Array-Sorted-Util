@@ -3,9 +3,9 @@ use List::Sorted::Util;
 
 plan 3;
 
-subtest "finds on simple letter list" =>  {
+subtest "finds / deletes on simple letter list" =>  {
     my str @a = <a b c d e f g h i j>;
-    plan 3 * @a + 3;
+    plan 4 * @a + 4;
 
     for @a.kv -> $i, $letter {
         is finds(@a, $letter), $i, "did we find '$letter'";
@@ -24,15 +24,26 @@ subtest "finds on simple letter list" =>  {
     for "A", "Z", "ee" {
         is-deeply finds(@a, $_), Nil, "did we not find '$_'";
     }
+
+    for @a.clone.pick(*) {
+        is-deeply deletes(@a,$_), $_, "did '$_' get deleted";
+    }
+    is +@a, 0, 'Did we delete all elements';
 }
 
-subtest "finds on all words from this file" => {
-    my str @words = $?FILE.IO.comb(/\w+/).sort.squish;
-    plan +@words;
+subtest "finds / deletes on all words from this file" => {
+    my str @a = $?FILE.IO.comb(/\w+/).sort.squish;
+    plan 2 * @a + 1;
 
-    for @words.kv -> $i, $word {
-        is finds(@words, $word), $i, "did we find '$word'";
+    for @a.kv -> $i, $word {
+        is finds(@a, $word), $i, "did we find '$word'";
     }
+
+    for @a.clone.pick(*) {
+        is-deeply deletes(@a,$_,:cmp(&[cmp])), $_,
+        "did '$_' get deleted using &[cmp]";
+    }
+    is +@a, 0, 'Did we delete all elements';
 }
 
 subtest "inserts on an empty list" => {

@@ -57,25 +57,49 @@ while @lines {
 
     # spurt the role
     say Q:to/SOURCE/.subst(/ '#' (\w+) '#' /, -> $/ { %mapper{$0} }, :g).chomp;
+my #type# @insert_#postfix#;
+my #type# @delete_#postfix#;
+
 #-------------------------------------------------------------------------------
 # Publicly visible #type# candidates
 
-multi sub finds(#type# @a, #Type#:D $needle) {
+my multi sub finds(#type# @a, #Type#:D $needle) {
     nqp::islt_i((my int $i = finds_#postfix#(@a, $needle)),0)
       ?? Nil
       !! $i
 }
-multi sub finds(#type# @a, #Type#:D $needle, :&cmp!) {
+my multi sub finds(#type# @a, #Type#:D $needle, :&cmp!) {
     nqp::islt_i((my int $i = finds_#postfix#_cmp(@a, $needle, &cmp)),0)
       ?? Nil
       !! $i
 }
 
-multi sub inserts(#type# @a, #Type#:D $needle, :$force) {
+my multi sub inserts(#type# @a, #Type#:D $needle, :$force) {
     inserts_#postfix#(@a, $needle, finds_#postfix#(@a, $needle), $force.Bool)
 }
-multi sub inserts(#type# @a, #Type#:D $needle, :&cmp!, :$force) {
+my multi sub inserts(#type# @a, #Type#:D $needle, :&cmp!, :$force) {
     inserts_#postfix#(@a, $needle, finds_#postfix#_cmp(@a, $needle, &cmp), $force.Bool)
+}
+
+my multi sub deletes(#type# @a, #Type#:D $needle) {
+    nqp::if(
+      nqp::islt_i((my int $i = finds_#postfix#(@a, $needle)),0),
+      Nil,
+      nqp::stmts(
+        nqp::splice(@a,@delete_#postfix#,$i,1),
+        $needle
+      )
+    )
+}
+my multi sub deletes(#type# @a, #Type#:D $needle, :&cmp!) {
+    nqp::if(
+      nqp::islt_i((my int $i = finds_#postfix#_cmp(@a, $needle, &cmp)),0),
+      Nil,
+      nqp::stmts(
+        nqp::splice(@a,@delete_#postfix#,$i,1),
+        $needle
+      )
+    )
 }
 
 #-------------------------------------------------------------------------------
@@ -175,13 +199,11 @@ my sub finds_#postfix#_cmp(#type# @a, #type# $needle, &cmp) {
 }
 
 my sub inserts_#postfix#(#type# @a, #type# $needle, int $i, int $force) {
+    nqp::bindpos_#postfix#(@insert_#postfix#,0,$needle);
     nqp::if(
       nqp::islt_i($i,0),
       nqp::splice(                                      # not found
-        @a,
-        nqp::list_#postfix#($needle),
-        nqp::abs_i(nqp::add_i($i,1)),
-        0
+        @a,@insert_#postfix#,nqp::abs_i(nqp::add_i($i,1)),0
       ),
       nqp::if(                                          # found
         $force,
@@ -192,7 +214,7 @@ my sub inserts_#postfix#(#type# @a, #type# $needle, int $i, int $force) {
               && nqp::iseq_s($needle,nqp::atpos_#postfix#(@a,$j)),
             nqp::null
           ),
-          nqp::splice(@a,nqp::list_#postfix#($needle),$j,1)
+          nqp::splice(@a,@insert_#postfix#,$j,1)
         )
       )
     );
