@@ -471,6 +471,9 @@ List::Sorted::Util is ...
 
 Elizabeth Mattijsen <liz@wenzperl.nl>
 
+Source can be located at: https://github.com/lizmat/List-Sorted-Util . Comments and
+Pull Requests are welcome.
+
 =head1 COPYRIGHT AND LICENSE
 
 Copyright 2021 Elizabeth Mattijsen
