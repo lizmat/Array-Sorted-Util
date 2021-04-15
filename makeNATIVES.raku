@@ -15,7 +15,7 @@ my $idchars   = 3;
 my $end       = '#- end of generated part of ';
 
 # slurp the whole file and set up writing to it
-my $filename = "lib/List/Sorted/Util.rakumod";
+my $filename = "lib/Array/Sorted/Util.rakumod";
 my @lines = $filename.IO.lines;
 $*OUT = $filename.IO.open(:w);
 

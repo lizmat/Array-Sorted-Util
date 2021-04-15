@@ -1,4 +1,4 @@
-unit module List::Sorted::Util:ver<0.0.1>:auth<cpan:ELIZABETH>;
+unit module Array::Sorted::Util:ver<0.0.1>:auth<cpan:ELIZABETH>;
 
 use nqp;
 
@@ -640,13 +640,13 @@ my sub inserts_n(num @a, num $needle, int $i, int $force) {
 
 =head1 NAME
 
-List::Sorted::Util - Raku utilities for (native) sorted lists
+Array::Sorted::Util - Raku utilities for (native) sorted arrays
 
 =head1 SYNOPSIS
 
 =begin code :lang<raku>
 
-use List::Sorted::Util;  # imports finds, inserts, deletes
+use Array::Sorted::Util;  # imports finds, inserts, deletes
 
 my @a;
 inserts(@a,$_) for <d c f e g h a b j i>;
@@ -662,8 +662,8 @@ say @a;               # [a b c d f g h i j]
 
 =head1 DESCRIPTION
 
-List::Sorted::Util exports a set of subroutines that create and manipulate
-sorted lists.
+Array::Sorted::Util exports a set of subroutines that create and manipulate
+sorted arrays.
 
 =head1 SUBROUTINES
 
@@ -679,7 +679,7 @@ inserts(@a, "foo", :cmp(&[coll]));
 =end code
 
 Insert the given object (the second argument) into the correct location in
-the given list (the first argument).  Takes a named argument C<cmp> to
+the given array (the first argument).  Takes a named argument C<cmp> to
 indicate the logic that should be used to determine order (defaults
 to &infix:<cmp>).
 
@@ -694,7 +694,7 @@ say finds(@a, "z", :cmp(&[coll]));  # Nil
 =end code
 
 Attempt to find the given object (the second argument) in the given
-sorted list (the first argument).  Takes a named argument C<cmp> to
+sorted array (the first argument).  Takes a named argument C<cmp> to
 indicate the logic that should be used to determine order (defaults
 to &infix:<cmp>).
 
@@ -709,7 +709,7 @@ say deletes(@a, "z", :cmp(&[coll]));  # Nil
 =end code
 
 Attempt to remove the given object (the second argument) from the given
-sorted list (the first argument).  Takes a named argument C<cmp> to
+sorted array (the first argument).  Takes a named argument C<cmp> to
 indicate the logic that should be used to determine order (defaults
 to &infix:<cmp>).
 
