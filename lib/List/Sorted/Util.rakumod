@@ -646,13 +646,80 @@ List::Sorted::Util - Raku utilities for (native) sorted lists
 
 =begin code :lang<raku>
 
-use List::Sorted::Util;
+use List::Sorted::Util;  # imports finds, inserts, deletes
+
+my @a;
+inserts(@a,$_) for <d c f e g h a b j i>;
+say @a;               # [a b c d e f g h i j]
+
+say finds(@a,"h");    # 7
+say finds(@a,"z");    # Nil
+
+say deletes(@a,"e");  # e
+say @a;               # [a b c d f g h i j]
 
 =end code
 
 =head1 DESCRIPTION
 
-List::Sorted::Util is ...
+List::Sorted::Util exports a set of subroutines that create and manipulate
+sorted lists.
+
+=head1 SUBROUTINES
+
+=head2 inserts
+
+=begin code :lang<raku>
+
+my @a;
+inserts(@a, "foo");  # use &infix:<cmp> by default
+
+inserts(@a, "foo", :cmp(&[coll]));
+
+=end code
+
+Insert the given object (the second argument) into the correct location in
+the given list (the first argument).  Takes a named argument C<cmp> to
+indicate the logic that should be used to determine order (defaults
+to &infix:<cmp>).
+
+=head2 finds
+
+=begin code :lang<raku>
+
+my @a = <a b c d e f g h i j>;
+say finds(@a, "h");                 # 7, use &infix:<cmp> by default
+say finds(@a, "z", :cmp(&[coll]));  # Nil
+
+=end code
+
+Attempt to find the given object (the second argument) in the given
+sorted list (the first argument).  Takes a named argument C<cmp> to
+indicate the logic that should be used to determine order (defaults
+to &infix:<cmp>).
+
+=head2 deletes
+
+=begin code :lang<raku>
+
+my @a = <a b c d e f g h i j>;
+say deletes(@a, "e");                 # e, use &infix:<cmp> by default
+say deletes(@a, "z", :cmp(&[coll]));  # Nil
+
+=end code
+
+Attempt to remove the given object (the second argument) from the given
+sorted list (the first argument).  Takes a named argument C<cmp> to
+indicate the logic that should be used to determine order (defaults
+to &infix:<cmp>).
+
+=head1 INSPIRATION
+
+The inspiration for these names is from the TUTOR Programming Language,
+which had C<finds>, C<inserts> and C<deletes> commands.
+
+See https://files.eric.ed.gov/fulltext/ED208879.pdf for more information
+(pages C16 and C17).
 
 =head1 AUTHOR
 
