@@ -6,8 +6,128 @@ proto sub finds(|)   is export {*}
 proto sub inserts(|) is export {*}
 proto sub deletes(|) is export {*}
 
+#-------------------------------------------------------------------------------
+# Publicly visible opaque candidates
+
+my multi sub finds(@a, $needle) {
+    nqp::islt_i((my int $i = finds_o_cmp(@a, $needle, &[cmp])),0)
+      ?? Nil
+      !! $i
+}
+my multi sub finds(@a, $needle, :&cmp!) {
+    nqp::islt_i((my int $i = finds_o_cmp(@a, $needle, &cmp)),0)
+      ?? Nil
+      !! $i
+}
+
+my multi sub inserts(@a, $needle, :$force) {
+    inserts_o_cmp(
+      @a, $needle, finds_o_cmp(@a, $needle, &[cmp]), &[cmp], $force.Bool
+    )
+}
+my multi sub inserts(@a, $needle, :&cmp!, :$force) {
+    inserts_o_cmp(
+      @a, $needle, finds_o_cmp(@a, $needle, &cmp), &cmp, $force.Bool
+    )
+}
+
+my multi sub deletes(@a, $needle) {
+    nqp::if(
+      nqp::islt_i((my int $i = finds_o_cmp(@a, $needle, &[cmp])),0),
+      Nil,
+      nqp::stmts(
+        @a.splice($i,1),
+        $needle
+      )
+    )
+}
+my multi sub deletes(@a, $needle, :&cmp!) {
+    nqp::if(
+      nqp::islt_i((my int $i = finds_o_cmp(@a, $needle, &cmp)),0),
+      Nil,
+      nqp::stmts(
+        @a.splice($i,1),
+        $needle
+      )
+    )
+}
+
+#-------------------------------------------------------------------------------
+# Actual opaque workhorses
+
+my sub finds_o_cmp(@a, $needle, &cmp) {
+    my int $start;
+    my int $elems = @a.elems;   # reifies
+    my int $end   = nqp::sub_i($elems,1);
+    my int $i     = nqp::div_i($elems,2);
+
+    nqp::while(
+      nqp::isge_i($i,$start) && nqp::isle_i($i,$end),  # not done yet
+      nqp::if(
+        nqp::eqaddr(
+          (my $cmp := cmp($needle,@a.AT-POS($i))),
+          Order::Less
+        ),
+        nqp::stmts(                                    # needle is less
+          ($end = nqp::sub_i($i,1)),
+          ($i = nqp::div_i(
+            nqp::add_i($start,nqp::add_i($end,1)),
+            2
+          ))
+        ),
+        nqp::if(
+          nqp::eqaddr($cmp,Order::More),
+          nqp::if(                                     # needle is more
+            nqp::islt_i($i,$end),
+            nqp::stmts(                                # still before end
+              ($start = nqp::add_i($i,1)),
+              ($i = nqp::div_i(
+                nqp::add_i($start,nqp::add_i($end,1)),
+                2
+              ))
+            ),
+            (return nqp::neg_i(nqp::add_i($end,2)))    # at end
+          ),
+          nqp::stmts(                                  # found needle
+            nqp::while(                                # find first occurrence
+              nqp::isge_i(($i = nqp::sub_i($i,1)),0)
+                && nqp::eqaddr(cmp($needle,@a.AT-POS($i)),Order::Same),
+              nqp::null
+            ),
+            (return nqp::add_i($i,1))
+          )
+        )
+      )
+    );
+
+    # before or after the list
+    nqp::neg_i(nqp::add_i($i,1))
+}
+
+my sub inserts_o_cmp(@a, $needle, int $i, &cmp, int $force) {
+    nqp::if(
+      nqp::islt_i($i,0),
+      @a.splice(nqp::abs_i(nqp::add_i($i,1)),0,$needle),# not found
+      nqp::if(                                          # found
+        $force,
+        nqp::stmts(                                     # force insertion
+          (my int $j = $i),
+          (my int $elems = @a.elems),
+          nqp::while(                                   # insert after last
+            nqp::islt_i(($j = nqp::add_i($j,1)),$elems)
+              && nqp::eqaddr(cmp($needle,@a.AT-POS($j)),Order::Same),
+            nqp::null
+          ),
+          @a.splice($j,0,$needle)
+        )
+      )
+    );
+
+    @a
+}
+
 #- start of generated part of str candidates ----------------------------------
-#- Generated on 2021-04-15T19:12:37+02:00 by ./makeNATIVES.raku
+#- Generated on 2021-04-15T22:43:01+02:00 by ./makeNATIVES.raku
 #- PLEASE DON'T CHANGE ANYTHING BELOW THIS LINE
 my str @insert_s;
 my str @delete_s;
@@ -166,7 +286,7 @@ my sub inserts_s(str @a, str $needle, int $i, int $force) {
               && nqp::iseq_s($needle,nqp::atpos_s(@a,$j)),
             nqp::null
           ),
-          nqp::splice(@a,@insert_s,$j,1)
+          nqp::splice(@a,@insert_s,$j,0)
         )
       )
     );
@@ -177,7 +297,7 @@ my sub inserts_s(str @a, str $needle, int $i, int $force) {
 #- end of generated part of str candidates ------------------------------------
 
 #- start of generated part of int candidates ----------------------------------
-#- Generated on 2021-04-15T19:12:37+02:00 by ./makeNATIVES.raku
+#- Generated on 2021-04-15T22:43:01+02:00 by ./makeNATIVES.raku
 #- PLEASE DON'T CHANGE ANYTHING BELOW THIS LINE
 my int @insert_i;
 my int @delete_i;
@@ -336,7 +456,7 @@ my sub inserts_i(int @a, int $needle, int $i, int $force) {
               && nqp::iseq_s($needle,nqp::atpos_i(@a,$j)),
             nqp::null
           ),
-          nqp::splice(@a,@insert_i,$j,1)
+          nqp::splice(@a,@insert_i,$j,0)
         )
       )
     );
@@ -347,7 +467,7 @@ my sub inserts_i(int @a, int $needle, int $i, int $force) {
 #- end of generated part of int candidates ------------------------------------
 
 #- start of generated part of num candidates ----------------------------------
-#- Generated on 2021-04-15T19:12:37+02:00 by ./makeNATIVES.raku
+#- Generated on 2021-04-15T22:43:01+02:00 by ./makeNATIVES.raku
 #- PLEASE DON'T CHANGE ANYTHING BELOW THIS LINE
 my num @insert_n;
 my num @delete_n;
@@ -506,7 +626,7 @@ my sub inserts_n(num @a, num $needle, int $i, int $force) {
               && nqp::iseq_s($needle,nqp::atpos_n(@a,$j)),
             nqp::null
           ),
-          nqp::splice(@a,@insert_n,$j,1)
+          nqp::splice(@a,@insert_n,$j,0)
         )
       )
     );

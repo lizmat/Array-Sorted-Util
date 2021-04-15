@@ -1,47 +1,28 @@
 use Test;
 use List::Sorted::Util;
 
-plan 3;
+plan 2;
 
-subtest "finds on simple letter list" =>  {
-    my str @a = <a b c d e f g h i j>;
-    plan 3 * @a + 3;
+subtest "finds on simple Instant list" =>  {
+    my @a = now xx 10;
+    plan @a + 2;
 
-    for @a.kv -> $i, $letter {
-        is finds(@a, $letter), $i, "did we find '$letter'";
+    for @a.kv -> $i, $instant {
+        is finds(@a, $instant), $i, "did we find '$instant'";
     }
 
-    for @a.kv -> $i, $letter {
-        is finds(@a, $letter.uc, :cmp(*.lc cmp *.lc)), $i,
-        "did we find '$letter.uc()'";
-    }
-
-    for @a.kv -> $i, $letter {
-        is finds(@a, $letter, :cmp(&[coll])), $i,
-        "did we find '$letter' using &[coll]";
-    }
-
-    for "A", "Z", "ee" {
+    for Instant.from-posix(0), Instant.from-posix(time + 100) {
         is-deeply finds(@a, $_), Nil, "did we not find '$_'";
     }
 }
 
-subtest "finds on all words from this file" => {
-    my str @words = $?FILE.IO.comb(/\w+/).sort.squish;
-    plan +@words;
-
-    for @words.kv -> $i, $word {
-        is finds(@words, $word), $i, "did we find '$word'";
-    }
-}
-
 subtest "inserts on an empty list" => {
-    my str @a = <a b c d e f g h i j>;
-    my str @b;
+    my @a = now xx 10;
+    my @b;
 
     plan @a + 1;
 
-    for @a.pick(*) {
+    for @a.clone.pick(*) {
         is-deeply inserts(@b,$_), @b, "inserting '$_'";
     }
     is-deeply @b, @a, "did we get a correctly sorted list";

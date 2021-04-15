@@ -214,7 +214,7 @@ my sub inserts_#postfix#(#type# @a, #type# $needle, int $i, int $force) {
               && nqp::iseq_s($needle,nqp::atpos_#postfix#(@a,$j)),
             nqp::null
           ),
-          nqp::splice(@a,@insert_#postfix#,$j,1)
+          nqp::splice(@a,@insert_#postfix#,$j,0)
         )
       )
     );
