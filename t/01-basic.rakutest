@@ -1,0 +1,50 @@
+use Test;
+use List::Sorted::Util;
+
+plan 3;
+
+subtest "finds on simple letter list" =>  {
+    my str @a = <a b c d e f g h i j>;
+    plan 3 * @a + 3;
+
+    for @a.kv -> $i, $letter {
+        is finds(@a, $letter), $i, "did we find '$letter'";
+    }
+
+    for @a.kv -> $i, $letter {
+        is finds(@a, $letter.uc, :cmp(*.lc cmp *.lc)), $i,
+        "did we find '$letter.uc()'";
+    }
+
+    for @a.kv -> $i, $letter {
+        is finds(@a, $letter, :cmp(&[coll])), $i,
+        "did we find '$letter' using &[coll]";
+    }
+
+    for "A", "Z", "ee" {
+        is-deeply finds(@a, $_), Nil, "did we not find '$_'";
+    }
+}
+
+subtest "finds on all words from this file" => {
+    my str @words = $?FILE.IO.comb(/\w+/).sort.squish;
+    plan +@words;
+
+    for @words.kv -> $i, $word {
+        is finds(@words, $word), $i, "did we find '$word'";
+    }
+}
+
+subtest "inserts on an empty list" => {
+    my str @a = <a b c d e f g h i j>;
+    my str @b;
+
+    plan @a + 1;
+
+    for @a.pick(*) {
+        is-deeply inserts(@b,$_), @b, "inserting '$_'";
+    }
+    is-deeply @b, @a, "did we get a correctly sorted list";
+}
+
+# vim: expandtab shiftwidth=4

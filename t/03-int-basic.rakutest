@@ -1,0 +1,45 @@
+use Test;
+use List::Sorted::Util;
+
+plan 3;
+
+subtest "finds on simple int list" =>  {
+    my int @a = 1,3,5,7,9;
+    plan 2 * @a + 3;
+
+    for @a.kv -> $i, $number {
+        is finds(@a, $number), $i, "did we find '$number'";
+    }
+
+    for @a.kv -> $i, $number {
+        is finds(@a, $number, :cmp(&[<=>])), $i,
+        "did we find '$number' using &[<=>]";
+    }
+
+    for 0,10,6 {
+        is-deeply finds(@a, $_), Nil, "did we not find '$_'";
+    }
+}
+
+subtest "finds on all ints from this file" => {
+    my int @a = $?FILE.IO.comb(/\d+/).sort(*.Int).squish.map: *.Int;
+    plan +@a;
+
+    for @a.kv -> $i, $number {
+        is finds(@a, $number), $i, "did we find '$number'";
+    }
+}
+
+subtest "inserts on an empty int list" => {
+    my int @a = 1,3,5,7,9;
+    my int @b;
+
+    plan @a + 1;
+
+    for @a.pick(*) {
+        is-deeply inserts(@b,$_), @b, "inserting '$_'";
+    }
+    is-deeply @b, @a, "did we get a correctly sorted list";
+}
+
+# vim: expandtab shiftwidth=4
