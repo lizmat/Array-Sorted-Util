@@ -453,7 +453,7 @@ my sub inserts_n(num @a, num $needle, int $i, int $force) {
 
 =head1 NAME
 
-List::Sorted::Util - blah blah blah
+List::Sorted::Util - Raku utilities for (native) sorted lists
 
 =head1 SYNOPSIS
 

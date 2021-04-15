@@ -7,7 +7,7 @@
   ],
   "depends": [
   ],
-  "description": "blah blah blah",
+  "description": "Raku utilities for (native) sorted lists",
   "license": "Artistic-2.0",
   "name": "List::Sorted::Util",
   "perl": "6.d",

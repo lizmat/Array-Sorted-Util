@@ -1,7 +1,7 @@
 NAME
 ====
 
-List::Sorted::Util - blah blah blah
+List::Sorted::Util - Raku utilities for (native) sorted lists
 
 SYNOPSIS
 ========
