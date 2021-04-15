@@ -9,14 +9,14 @@
   ],
   "description": "Raku utilities for (native) sorted lists",
   "license": "Artistic-2.0",
-  "name": "List::Sorted::Util",
+  "name": "Array::Sorted::Util",
   "perl": "6.d",
   "provides": {
-    "List::Sorted::Util": "lib/List/Sorted/Util.rakumod"
+    "Array::Sorted::Util": "lib/Array/Sorted/Util.rakumod"
   },
   "resources": [
   ],
-  "source-url": "https://github.com/lizmat/List-Sorted-Util.git",
+  "source-url": "https://github.com/lizmat/Array-Sorted-Util.git",
   "tags": [
   ],
   "test-depends": [

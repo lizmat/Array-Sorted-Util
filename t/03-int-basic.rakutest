@@ -1,5 +1,5 @@
 use Test;
-use List::Sorted::Util;
+use Array::Sorted::Util;
 
 plan 3;
 
