@@ -4,7 +4,11 @@ use List::Sorted::Util;
 plan 2;
 
 subtest "finds on simple Instant list" =>  {
-    my @a = now xx 10;
+    my @a;
+    for ^10 {
+        @a.push(now);
+        sleep .1;
+    }
     plan @a + 2;
 
     for @a.kv -> $i, $instant {
@@ -17,7 +21,11 @@ subtest "finds on simple Instant list" =>  {
 }
 
 subtest "inserts on an empty list" => {
-    my @a = now xx 10;
+    my @a;
+    for ^10 {
+        @a.push(now);
+        sleep .1;
+    }
     my @b;
 
     plan @a + 1;
