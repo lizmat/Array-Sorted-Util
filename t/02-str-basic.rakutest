@@ -5,7 +5,7 @@ plan 3;
 
 subtest "finds / deletes on simple letter list" =>  {
     my str @a = <a b c d e f g h i j>;
-    plan 4 * @a + 4;
+    plan 4 * @a + 7;
 
     for @a.kv -> $i, $letter {
         is finds(@a, $letter), $i, "did we find '$letter'";
@@ -21,8 +21,10 @@ subtest "finds / deletes on simple letter list" =>  {
         "did we find '$letter' using &[coll]";
     }
 
-    for "A", "Z", "ee" {
-        is-deeply finds(@a, $_), Nil, "did we not find '$_'";
+    for "A", 0, "z", 10, "ee", 5 -> $letter, $pos {
+        my $index := finds(@a,$letter);
+        nok $index.defined, "did the search for '$letter' fail";
+        is $index.Int, $pos, "did it give insert location $index";
     }
 
     for @a.clone.pick(*) {
@@ -50,11 +52,9 @@ subtest "inserts on an empty list" => {
     my str @a = <a b c d e f g h i j>;
     my str @b;
 
-    plan @a + 1;
+    plan 1;
 
-    for @a.pick(*) {
-        is-deeply inserts(@b,$_), @b, "inserting '$_'";
-    }
+    inserts(@b,$_) for @a.clone.pick(*);
     is-deeply @b, @a, "did we get a correctly sorted list";
 }
 

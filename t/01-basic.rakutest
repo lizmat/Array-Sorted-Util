@@ -3,12 +3,14 @@ use Array::Sorted::Util;
 
 plan 2;
 
+my @instants;
+for ^10 {
+    @instants.push(now);
+    sleep .1;
+}
+
 subtest "finds on simple Instant list" =>  {
-    my @a;
-    for ^10 {
-        @a.push(now);
-        sleep .1;
-    }
+    my @a = @instants;
     plan @a + 2;
 
     for @a.kv -> $i, $instant {
@@ -16,24 +18,23 @@ subtest "finds on simple Instant list" =>  {
     }
 
     for Instant.from-posix(0), Instant.from-posix(time + 100) {
-        is-deeply finds(@a, $_), Nil, "did we not find '$_'";
+        nok finds(@a, $_).defined, "did we not find '$_'";
     }
 }
 
 subtest "inserts on an empty list" => {
-    my @a;
-    for ^10 {
-        @a.push(now);
-        sleep .1;
-    }
+    my @a = @instants;
     my @b;
 
-    plan @a + 1;
+    plan @a + 2;
 
-    for @a.clone.pick(*) {
-        is-deeply inserts(@b,$_), @b, "inserting '$_'";
+    for @a.kv -> $i, $value {
+        is inserts(@b,$value).Int, $i, "inserted ok at $i";
     }
-    is-deeply @b, @a, "did we get a correctly sorted list";
+    is-deeply @b, @a, "did we get a correctly sorted list (1)";
+
+    inserts(@b,$_) for @a.clone.pick(*);
+    is-deeply @b, @a, "did we get a correctly sorted list (2)";
 }
 
 # vim: expandtab shiftwidth=4

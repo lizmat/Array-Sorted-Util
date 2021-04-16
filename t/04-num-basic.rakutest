@@ -5,7 +5,7 @@ plan 3;
 
 subtest "finds on simple num list" =>  {
     my num @a = 1e0,3e0,5e0,7e0,9e0;
-    plan 3 * @a + 4;
+    plan 3 * @a + 7;
 
     for @a.kv -> $i, $number {
         is finds(@a, $number), $i, "did we find '$number'";
@@ -16,8 +16,10 @@ subtest "finds on simple num list" =>  {
         "did we find '$number' using &[<=>]";
     }
 
-    for 0e0,10e0,6e0 {
-        is-deeply finds(@a, $_), Nil, "did we not find '$_'";
+    for 0e0, 0, 10e0, 5, 6e0, 3 -> $number, $pos {
+        my $index := finds(@a,$number);
+        nok $index.defined, "did the search for '$number' fail";
+        is $index.Int, $pos, "did it give insert location $index";
     }
 
     for @a.clone.pick(*) {
@@ -45,11 +47,9 @@ subtest "inserts on an empty num list" => {
     my num @a = 1e0,3e0,5e0,7e0,9e0;
     my num @b;
 
-    plan @a + 1;
+    plan 1;
 
-    for @a.pick(*) {
-        is-deeply inserts(@b,$_), @b, "inserting '$_'";
-    }
+    inserts(@b,$_) for @a.clone.pick(*);
     is-deeply @b, @a, "did we get a correctly sorted list";
 }
 

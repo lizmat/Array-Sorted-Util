@@ -64,14 +64,10 @@ my #type# @delete_#postfix#;
 # Publicly visible #type# candidates
 
 my multi sub finds(#type# @a, #Type#:D $needle) {
-    nqp::islt_i((my int $i = finds_#postfix#(@a, $needle)),0)
-      ?? Nil
-      !! $i
+    finds_#postfix#(@a, $needle)
 }
 my multi sub finds(#type# @a, #Type#:D $needle, :&cmp!) {
-    nqp::islt_i((my int $i = finds_#postfix#_cmp(@a, $needle, &cmp)),0)
-      ?? Nil
-      !! $i
+    finds_#postfix#_cmp(@a, $needle, &cmp)
 }
 
 my multi sub inserts(#type# @a, #Type#:D $needle, :$force) {
@@ -83,7 +79,10 @@ my multi sub inserts(#type# @a, #Type#:D $needle, :&cmp!, :$force) {
 
 my multi sub deletes(#type# @a, #Type#:D $needle) {
     nqp::if(
-      nqp::islt_i((my int $i = finds_#postfix#(@a, $needle)),0),
+      nqp::istype(
+        (my $i := finds_#postfix#(@a, $needle)),
+        NotFound
+      ),
       Nil,
       nqp::stmts(
         nqp::splice(@a,@delete_#postfix#,$i,1),
@@ -93,7 +92,10 @@ my multi sub deletes(#type# @a, #Type#:D $needle) {
 }
 my multi sub deletes(#type# @a, #Type#:D $needle, :&cmp!) {
     nqp::if(
-      nqp::islt_i((my int $i = finds_#postfix#_cmp(@a, $needle, &cmp)),0),
+      nqp::istype(
+        (my $i := finds_#postfix#_cmp(@a, $needle, &cmp)),
+        NotFound
+      ),
       Nil,
       nqp::stmts(
         nqp::splice(@a,@delete_#postfix#,$i,1),
@@ -132,13 +134,13 @@ my sub finds_#postfix#(#type# @a, #type# $needle) {
                 2
               ))
             ),
-            (return nqp::neg_i(nqp::add_i($end,2)))    # at end
+            (return nqp::box_i(nqp::add_i($end,1),NotFound))
           )
         ),
         nqp::stmts(                                    # needle found
           nqp::while(                                  # find first occurrence
             nqp::isge_i(($i = nqp::sub_i($i,1)),0)
-              && nqp::iseq_s($needle,nqp::atpos_#postfix#(@a,$i)),
+              && nqp::iseq_#postfix#($needle,nqp::atpos_#postfix#(@a,$i)),
             nqp::null
           ),
           (return nqp::add_i($i,1))
@@ -147,7 +149,7 @@ my sub finds_#postfix#(#type# @a, #type# $needle) {
     );
 
     # before or after the list
-    nqp::neg_i(nqp::add_i($i,1))
+    nqp::box_i($i,NotFound)
 }
 
 my sub finds_#postfix#_cmp(#type# @a, #type# $needle, &cmp) {
@@ -180,7 +182,7 @@ my sub finds_#postfix#_cmp(#type# @a, #type# $needle, &cmp) {
                 2
               ))
             ),
-            (return nqp::neg_i(nqp::add_i($end,2)))    # at end
+            (return nqp::box_i(nqp::add_i($end,1),NotFound))
           ),
           nqp::stmts(                                  # found needle
             nqp::while(                                # find first occurrence
@@ -195,15 +197,16 @@ my sub finds_#postfix#_cmp(#type# @a, #type# $needle, &cmp) {
     );
 
     # before or after the list
-    nqp::neg_i(nqp::add_i($i,1))
+    nqp::box_i($i,NotFound)
 }
 
-my sub inserts_#postfix#(#type# @a, #type# $needle, int $i, int $force) {
+my sub inserts_#postfix#(#type# @a, #type# $needle, Int:D $i, int $force) {
     nqp::bindpos_#postfix#(@insert_#postfix#,0,$needle);
     nqp::if(
-      nqp::islt_i($i,0),
-      nqp::splice(                                      # not found
-        @a,@insert_#postfix#,nqp::abs_i(nqp::add_i($i,1)),0
+      nqp::istype($i,NotFound),
+      nqp::stmts(                                       # not found
+        nqp::splice(@a,@insert_#postfix#,$i,0),
+        nqp::box_i($i,Int)
       ),
       nqp::if(                                          # found
         $force,
@@ -214,13 +217,13 @@ my sub inserts_#postfix#(#type# @a, #type# $needle, int $i, int $force) {
               && nqp::iseq_s($needle,nqp::atpos_#postfix#(@a,$j)),
             nqp::null
           ),
-          nqp::splice(@a,@insert_#postfix#,$j,0)
+          nqp::splice(@a,@insert_#postfix#,$j,0),
+          $j
         )
       )
-    );
-
-    @a
+    )
 }
+
 SOURCE
 
     # we're done for this role
