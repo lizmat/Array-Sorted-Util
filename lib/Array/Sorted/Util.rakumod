@@ -1,5 +1,7 @@
 unit module Array::Sorted::Util:ver<0.0.1>:auth<cpan:ELIZABETH>;
 
+# This modules is prepared to be incorporated into the Rakudo core,
+# so it set up to be as performant as possible already using nqp ops.
 use nqp;
 
 my class NotFound is Int {
@@ -15,33 +17,6 @@ proto sub deletes(|) is export {*}
 # Publicly visible opaque candidates
 
 my multi sub finds(@a, $needle, :&cmp = &[cmp]) {
-    finds_o_cmp(@a, $needle, &cmp)
-}
-
-my multi sub inserts(@a, $needle, :&cmp = &[cmp], :$force) {
-    inserts_o_cmp(
-      @a, $needle, finds_o_cmp(@a, $needle, &cmp), &cmp, $force.Bool
-    )
-}
-
-my multi sub deletes(@a, $needle, :&cmp = &[cmp]) {
-    nqp::if(
-      nqp::istype(
-        (my $i := finds_o_cmp(@a, $needle, &cmp)),
-        NotFound
-      ),
-      Nil,
-      nqp::stmts(
-        @a.splice($i,1),
-        $needle
-      )
-    )
-}
-
-#-------------------------------------------------------------------------------
-# Actual opaque workhorses
-
-my sub finds_o_cmp(@a, $needle, &cmp) {
     my int $start;
     my int $elems = @a.elems;   # reifies
     my int $end   = nqp::sub_i($elems,1);
@@ -90,9 +65,9 @@ my sub finds_o_cmp(@a, $needle, &cmp) {
     nqp::box_i($i,NotFound)
 }
 
-my sub inserts_o_cmp(@a, $needle, Int:D $i, &cmp, int $force) {
+my multi sub inserts(@a, $needle, :&cmp = &[cmp], :$force) {
     nqp::if(
-      nqp::istype($i,NotFound),
+      nqp::istype((my $i := finds(@a, $needle, :&cmp)),NotFound),
       nqp::stmts(                                       # not found
         @a.splice($i,0,$needle),
         nqp::box_i($i,Int)
@@ -110,6 +85,17 @@ my sub inserts_o_cmp(@a, $needle, Int:D $i, &cmp, int $force) {
           @a.splice($j,0,$needle),
           $j
         )
+      )
+    )
+}
+
+my multi sub deletes(@a, $needle, :&cmp = &[cmp]) {
+    nqp::if(
+      nqp::istype((my $i := finds(@a, $needle, :&cmp)),NotFound),
+      Nil,
+      nqp::stmts(
+        @a.splice($i,1),
+        $needle
       )
     )
 }
