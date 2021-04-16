@@ -1,7 +1,7 @@
 use Test;
 use Array::Sorted::Util;
 
-plan 3;
+plan 4;
 
 subtest "finds on simple num list" =>  {
     my num @a = 1e0,3e0,5e0,7e0,9e0;
@@ -51,6 +51,27 @@ subtest "inserts on an empty num list" => {
 
     inserts(@b,$_) for @a.clone.pick(*);
     is-deeply @b, @a, "did we get a correctly sorted list";
+}
+
+subtest "inserts / deletes with associated list" => {
+    my num @a = 1e0,3e0,5e0,7e0,9e0;
+    my num @b;
+    my num @o;
+
+    plan @a + 4;
+
+    inserts(@b, $_, @o, $_) for @a.pick(*);
+    is-deeply @b, @a,
+      "did we get a correctly sorted list";
+    is-deeply @o, @a,
+      "did we get a correctly sorted alternate list";
+
+    for @a.pick(*) {
+        is-deeply deletes(@b, $_, @o), $_,
+          "did '$_' get deleted";
+    }
+    is +@b, 0, 'Did we delete all elements in primary';
+    is +@o, 0, 'Did we delete all elements in secondary';
 }
 
 # vim: expandtab shiftwidth=4

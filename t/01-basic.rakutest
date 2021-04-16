@@ -1,7 +1,7 @@
 use Test;
 use Array::Sorted::Util;
 
-plan 2;
+plan 3;
 
 my @instants;
 for ^10 {
@@ -9,7 +9,7 @@ for ^10 {
     sleep .1;
 }
 
-subtest "finds on simple Instant list" =>  {
+subtest "finds on simple Instant array" =>  {
     my @a = @instants;
     plan @a + 2;
 
@@ -22,7 +22,7 @@ subtest "finds on simple Instant list" =>  {
     }
 }
 
-subtest "inserts on an empty list" => {
+subtest "inserts on an empty array" => {
     my @a = @instants;
     my @b;
 
@@ -31,10 +31,21 @@ subtest "inserts on an empty list" => {
     for @a.kv -> $i, $value {
         is inserts(@b,$value).Int, $i, "inserted ok at $i";
     }
-    is-deeply @b, @a, "did we get a correctly sorted list (1)";
+    is-deeply @b, @a, "did we get a correctly sorted array (1)";
 
-    inserts(@b,$_) for @a.clone.pick(*);
-    is-deeply @b, @a, "did we get a correctly sorted list (2)";
+    inserts(@b,$_) for @a.pick(*);
+    is-deeply @b, @a, "did we get a correctly sorted array (2)";
+}
+
+subtest "deletes on an array" => {
+    my @a = @instants;
+
+    plan @a + 1;
+
+    for @instants.pick(*) {
+        is-deeply deletes(@a,$_), $_, "did '$_' get deleted";
+    }
+    is +@a, 0, "did we empty out the array";
 }
 
 # vim: expandtab shiftwidth=4
