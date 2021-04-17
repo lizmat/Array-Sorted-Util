@@ -70,19 +70,28 @@ my multi sub finds(#type# @a, #Type#:D $needle, :&cmp!) {
     finds_#postfix#_cmp(@a, $needle, &cmp)
 }
 
+my multi sub inserts(#type# @a, #Type#:D $needle, NotFound :$pos!) {
+    inserts_#postfix#(@a, $needle, $pos, True)
+}
 my multi sub inserts(#type# @a, #Type#:D $needle, :$force) {
     inserts_#postfix#(@a, $needle, finds_#postfix#(@a, $needle), $force.Bool)
+}
+
+my multi sub inserts(#type# @a, #Type#:D $needle, **@also, NotFound :$pos!) {
+    inserts_#postfix#(@a, $needle, $pos, True);
+    insert-also($pos, @also)
 }
 my multi sub inserts(#type# @a, #Type#:D $needle, **@also, :$force) {
     nqp::eqaddr((my $i := inserts(@a, $needle, :$force)),Nil)
       ?? $i
       !! insert-also($i, @also)
 }
+
 my multi sub inserts(#type# @a, #Type#:D $needle, :&cmp!, :$force) {
     inserts_#postfix#(@a, $needle, finds_#postfix#_cmp(@a, $needle, &cmp), $force.Bool)
 }
 my multi sub inserts(#type# @a, #Type#:D $needle, **@also, :&cmp = &[cmp], :$force) {
-    nqp::eqaddr((my $i := inserts(@a, $needle, :&cmp, :$force)),Nil)
+    nqp::eqaddr((my $i := inserts_#postfix#(@a, $needle, :&cmp, :$force)),Nil)
       ?? $i
       !! insert-also($i, @also)
 }
@@ -121,9 +130,9 @@ my multi sub deletes(#type# @a, #Type#:D $needle, :&cmp!) {
       )
     )
 }
-my multi sub deletes(@a, $needle, **@also, :&cmp!) {
+my multi sub deletes(#type# @a, #Type#:D $needle, **@also, :&cmp!) {
     nqp::if(
-      nqp::istype((my $i := finds_#postfix#(@a, $needle, &cmp)),NotFound),
+      nqp::istype((my $i := finds_#postfix#_cmp(@a, $needle, &cmp)),NotFound),
       Nil,
       nqp::stmts(
         nqp::splice(@a,@delete_#postfix#,$i,1),

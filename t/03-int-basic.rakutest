@@ -3,7 +3,7 @@ use Array::Sorted::Util;
 
 plan 4;
 
-subtest "finds / deletes on simple int list" =>  {
+subtest "finds / deletes on simple int array" =>  {
     my int @a = 1,3,5,7,9;
     plan 3 * @a + 7;
 
@@ -43,28 +43,28 @@ subtest "finds / deletes on all ints from this file" => {
     is +@a, 0, 'Did we delete all elements';
 }
 
-subtest "inserts on an empty int list" => {
+subtest "inserts on an empty int array" => {
     my int @a = 1,3,5,7,9;
     my int @b;
 
     plan 1;
 
     inserts(@b,$_) for @a.clone.pick(*);
-    is-deeply @b, @a, "did we get a correctly sorted list";
+    is-deeply @b, @a, "did we get a correctly sorted array";
 }
 
-subtest "inserts / deletes with associated list" => {
+subtest "inserts / deletes with associated array" => {
     my int @a = 1,3,5,7,9;
     my int @b;
     my int @o;
 
-    plan @a + 4;
+    plan @a + 5;
 
     inserts(@b, $_, @o, $_) for @a.pick(*);
     is-deeply @b, @a,
-      "did we get a correctly sorted list";
+      "did we get a correctly sorted array";
     is-deeply @o, @a,
-      "did we get a correctly sorted alternate list";
+      "did we get a correctly sorted alternate array";
 
     for @a.pick(*) {
         is-deeply deletes(@b, $_, @o), $_,
@@ -72,6 +72,11 @@ subtest "inserts / deletes with associated list" => {
     }
     is +@b, 0, 'Did we delete all elements in primary';
     is +@o, 0, 'Did we delete all elements in secondary';
+
+    for @a.pick(*) -> $number {
+        inserts(@b, $number, :pos($_)) without finds(@b, $number);
+    }
+    is-deeply @b, @a, "did we get a correctly sorted array";
 }
 
 # vim: expandtab shiftwidth=4

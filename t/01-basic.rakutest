@@ -40,12 +40,17 @@ subtest "inserts on an empty array" => {
 subtest "deletes on an array" => {
     my @a = @instants;
 
-    plan @a + 1;
+    plan @a + 2;
 
     for @instants.pick(*) {
         is-deeply deletes(@a,$_), $_, "did '$_' get deleted";
     }
     is +@a, 0, "did we empty out the array";
+
+    for @instants.pick(*) -> $instant {
+        inserts(@a,$instant,:pos($_)) without finds(@a, $instant);
+    }
+    is-deeply @a, @instants, "did we get a correctly sorted array (3)";
 }
 
 # vim: expandtab shiftwidth=4

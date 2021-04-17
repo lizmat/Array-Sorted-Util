@@ -1,4 +1,4 @@
-unit module Array::Sorted::Util:ver<0.0.1>:auth<cpan:ELIZABETH>;
+unit module Array::Sorted::Util:ver<0.0.2>:auth<cpan:ELIZABETH>;
 
 # This modules is prepared to be incorporated into the Rakudo core,
 # so it set up to be as performant as possible already using nqp ops.
@@ -68,6 +68,10 @@ my multi sub finds(@a, $needle, :&cmp = &[cmp]) {
     nqp::box_i($i,NotFound)
 }
 
+my multi sub inserts(@a, $needle, NotFound :$pos!) {
+    insert(@a, $pos, $needle)
+}
+
 my multi sub inserts(@a, $needle, :&cmp = &[cmp], :$force) {
     nqp::if(
       nqp::istype((my $i := finds(@a, $needle, :&cmp)),NotFound),
@@ -91,6 +95,11 @@ my multi sub inserts(@a, $needle, :&cmp = &[cmp], :$force) {
         Nil
       )
     )
+}
+
+my multi sub inserts(@a, $needle, **@also, NotFound :$pos!) {
+    insert(@a, $pos, $needle);
+    insert-also($pos, @also)
 }
 
 my multi sub inserts(@a, $needle, **@also, :&cmp = &[cmp], :$force) {
@@ -157,7 +166,7 @@ my multi sub delete(@a, \pos) {
 }
 
 #- start of generated part of str candidates -----------------------------------
-#- Generated on 2021-04-16T14:28:20+02:00 by ./makeNATIVES.raku
+#- Generated on 2021-04-17T19:06:39+02:00 by ./makeNATIVES.raku
 #- PLEASE DON'T CHANGE ANYTHING BELOW THIS LINE
 my str @insert_s;
 my str @delete_s;
@@ -172,19 +181,28 @@ my multi sub finds(str @a, Str:D $needle, :&cmp!) {
     finds_s_cmp(@a, $needle, &cmp)
 }
 
+my multi sub inserts(str @a, Str:D $needle, NotFound :$pos!) {
+    inserts_s(@a, $needle, $pos, True)
+}
 my multi sub inserts(str @a, Str:D $needle, :$force) {
     inserts_s(@a, $needle, finds_s(@a, $needle), $force.Bool)
+}
+
+my multi sub inserts(str @a, Str:D $needle, **@also, NotFound :$pos!) {
+    inserts_s(@a, $needle, $pos, True);
+    insert-also($pos, @also)
 }
 my multi sub inserts(str @a, Str:D $needle, **@also, :$force) {
     nqp::eqaddr((my $i := inserts(@a, $needle, :$force)),Nil)
       ?? $i
       !! insert-also($i, @also)
 }
+
 my multi sub inserts(str @a, Str:D $needle, :&cmp!, :$force) {
     inserts_s(@a, $needle, finds_s_cmp(@a, $needle, &cmp), $force.Bool)
 }
 my multi sub inserts(str @a, Str:D $needle, **@also, :&cmp = &[cmp], :$force) {
-    nqp::eqaddr((my $i := inserts(@a, $needle, :&cmp, :$force)),Nil)
+    nqp::eqaddr((my $i := inserts_s(@a, $needle, :&cmp, :$force)),Nil)
       ?? $i
       !! insert-also($i, @also)
 }
@@ -223,9 +241,9 @@ my multi sub deletes(str @a, Str:D $needle, :&cmp!) {
       )
     )
 }
-my multi sub deletes(@a, $needle, **@also, :&cmp!) {
+my multi sub deletes(str @a, Str:D $needle, **@also, :&cmp!) {
     nqp::if(
-      nqp::istype((my $i := finds_s(@a, $needle, &cmp)),NotFound),
+      nqp::istype((my $i := finds_s_cmp(@a, $needle, &cmp)),NotFound),
       Nil,
       nqp::stmts(
         nqp::splice(@a,@delete_s,$i,1),
@@ -359,7 +377,7 @@ my sub inserts_s(str @a, str $needle, Int:D $i, int $force) {
 #- end of generated part of str candidates -------------------------------------
 
 #- start of generated part of int candidates -----------------------------------
-#- Generated on 2021-04-16T14:28:20+02:00 by ./makeNATIVES.raku
+#- Generated on 2021-04-17T19:06:39+02:00 by ./makeNATIVES.raku
 #- PLEASE DON'T CHANGE ANYTHING BELOW THIS LINE
 my int @insert_i;
 my int @delete_i;
@@ -374,19 +392,28 @@ my multi sub finds(int @a, Int:D $needle, :&cmp!) {
     finds_i_cmp(@a, $needle, &cmp)
 }
 
+my multi sub inserts(int @a, Int:D $needle, NotFound :$pos!) {
+    inserts_i(@a, $needle, $pos, True)
+}
 my multi sub inserts(int @a, Int:D $needle, :$force) {
     inserts_i(@a, $needle, finds_i(@a, $needle), $force.Bool)
+}
+
+my multi sub inserts(int @a, Int:D $needle, **@also, NotFound :$pos!) {
+    inserts_i(@a, $needle, $pos, True);
+    insert-also($pos, @also)
 }
 my multi sub inserts(int @a, Int:D $needle, **@also, :$force) {
     nqp::eqaddr((my $i := inserts(@a, $needle, :$force)),Nil)
       ?? $i
       !! insert-also($i, @also)
 }
+
 my multi sub inserts(int @a, Int:D $needle, :&cmp!, :$force) {
     inserts_i(@a, $needle, finds_i_cmp(@a, $needle, &cmp), $force.Bool)
 }
 my multi sub inserts(int @a, Int:D $needle, **@also, :&cmp = &[cmp], :$force) {
-    nqp::eqaddr((my $i := inserts(@a, $needle, :&cmp, :$force)),Nil)
+    nqp::eqaddr((my $i := inserts_i(@a, $needle, :&cmp, :$force)),Nil)
       ?? $i
       !! insert-also($i, @also)
 }
@@ -425,9 +452,9 @@ my multi sub deletes(int @a, Int:D $needle, :&cmp!) {
       )
     )
 }
-my multi sub deletes(@a, $needle, **@also, :&cmp!) {
+my multi sub deletes(int @a, Int:D $needle, **@also, :&cmp!) {
     nqp::if(
-      nqp::istype((my $i := finds_i(@a, $needle, &cmp)),NotFound),
+      nqp::istype((my $i := finds_i_cmp(@a, $needle, &cmp)),NotFound),
       Nil,
       nqp::stmts(
         nqp::splice(@a,@delete_i,$i,1),
@@ -561,7 +588,7 @@ my sub inserts_i(int @a, int $needle, Int:D $i, int $force) {
 #- end of generated part of int candidates -------------------------------------
 
 #- start of generated part of num candidates -----------------------------------
-#- Generated on 2021-04-16T14:28:20+02:00 by ./makeNATIVES.raku
+#- Generated on 2021-04-17T19:06:39+02:00 by ./makeNATIVES.raku
 #- PLEASE DON'T CHANGE ANYTHING BELOW THIS LINE
 my num @insert_n;
 my num @delete_n;
@@ -576,19 +603,28 @@ my multi sub finds(num @a, Num:D $needle, :&cmp!) {
     finds_n_cmp(@a, $needle, &cmp)
 }
 
+my multi sub inserts(num @a, Num:D $needle, NotFound :$pos!) {
+    inserts_n(@a, $needle, $pos, True)
+}
 my multi sub inserts(num @a, Num:D $needle, :$force) {
     inserts_n(@a, $needle, finds_n(@a, $needle), $force.Bool)
+}
+
+my multi sub inserts(num @a, Num:D $needle, **@also, NotFound :$pos!) {
+    inserts_n(@a, $needle, $pos, True);
+    insert-also($pos, @also)
 }
 my multi sub inserts(num @a, Num:D $needle, **@also, :$force) {
     nqp::eqaddr((my $i := inserts(@a, $needle, :$force)),Nil)
       ?? $i
       !! insert-also($i, @also)
 }
+
 my multi sub inserts(num @a, Num:D $needle, :&cmp!, :$force) {
     inserts_n(@a, $needle, finds_n_cmp(@a, $needle, &cmp), $force.Bool)
 }
 my multi sub inserts(num @a, Num:D $needle, **@also, :&cmp = &[cmp], :$force) {
-    nqp::eqaddr((my $i := inserts(@a, $needle, :&cmp, :$force)),Nil)
+    nqp::eqaddr((my $i := inserts_n(@a, $needle, :&cmp, :$force)),Nil)
       ?? $i
       !! insert-also($i, @also)
 }
@@ -627,9 +663,9 @@ my multi sub deletes(num @a, Num:D $needle, :&cmp!) {
       )
     )
 }
-my multi sub deletes(@a, $needle, **@also, :&cmp!) {
+my multi sub deletes(num @a, Num:D $needle, **@also, :&cmp!) {
     nqp::if(
-      nqp::istype((my $i := finds_n(@a, $needle, &cmp)),NotFound),
+      nqp::istype((my $i := finds_n_cmp(@a, $needle, &cmp)),NotFound),
       Nil,
       nqp::stmts(
         nqp::splice(@a,@delete_n,$i,1),
@@ -807,6 +843,16 @@ my @b;
 my @c;
 inserts(@b, 'foo', @c, 'bar');  # multiple associated lists
 
+my @d = <a c e g i>;
+my $pos = finds(@d,"d");
+if $pos {
+    say "Found at $pos";
+}
+else {
+    inserts(@d,"d",:$pos);
+}
+say @d;  # (a c d e g i)
+
 =end code
 
 Insert the given object (the second argument) into the correct location in
@@ -815,6 +861,10 @@ indicate the logic that should be used to determine order (defaults
 to &infix:<cmp>).  Additionally takes array, object arguments to insert
 the given object in the associated array at the same location.  Returns the
 position at which the object(s) were actually inserted.
+
+Can also take an optional named argument C<pos> from a previously unsuccessful
+call to C<finds> as a shortcut to prevent needing to search for the object
+again.
 
 =head2 finds
 

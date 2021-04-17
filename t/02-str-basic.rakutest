@@ -3,7 +3,7 @@ use Array::Sorted::Util;
 
 plan 4;
 
-subtest "finds / deletes on simple letter list" =>  {
+subtest "finds / deletes on simple letter array" =>  {
     my str @a = <a b c d e f g h i j>;
     plan 4 * @a + 7;
 
@@ -48,28 +48,28 @@ subtest "finds / deletes on all words from this file" => {
     is +@a, 0, 'Did we delete all elements';
 }
 
-subtest "inserts on an empty list" => {
+subtest "inserts on an empty array" => {
     my str @a = <a b c d e f g h i j>;
     my str @b;
 
     plan 1;
 
     inserts(@b, $_) for @a.pick(*);
-    is-deeply @b, @a, "did we get a correctly sorted list";
+    is-deeply @b, @a, "did we get a correctly sorted array";
 }
 
-subtest "inserts / deletes with associated list" => {
+subtest "inserts / deletes with associated array" => {
     my str @a = <a b c d e f g h i j>;
     my str @b;
     my str @o;
 
-    plan @a + 4;
+    plan @a + 5;
 
     inserts(@b, $_, @o, $_) for @a.pick(*);
     is-deeply @b, @a,
-      "did we get a correctly sorted list";
+      "did we get a correctly sorted array";
     is-deeply @o, @a,
-      "did we get a correctly sorted alternate list";
+      "did we get a correctly sorted alternate array";
 
     for @a.pick(*) {
         is-deeply deletes(@b, $_, @o), $_,
@@ -77,6 +77,11 @@ subtest "inserts / deletes with associated list" => {
     }
     is +@b, 0, 'Did we delete all elements in primary';
     is +@o, 0, 'Did we delete all elements in secondary';
+
+    for @a.pick(*) -> $letter {
+        inserts(@b, $letter, :pos($_)) without finds(@b, $letter);
+    }
+    is-deeply @b, @a, "did we get a correctly sorted array";
 }
 
 # vim: expandtab shiftwidth=4
