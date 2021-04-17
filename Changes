@@ -1,6 +1,8 @@
 Revision history for Array::Sorted::Util
 
 {{$NEXT}}
+
+0.0.2  2021-04-17T19:23:36+02:00
     - Fix signature on one of the native deletes candidates
     - Add support for :pos to inserts, to prevent re-searching
 

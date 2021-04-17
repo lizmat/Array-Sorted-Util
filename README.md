@@ -42,9 +42,21 @@ inserts(@a, "foo");  # use &infix:<cmp> by default
 my @b;
 my @c;
 inserts(@b, 'foo', @c, 'bar');  # multiple associated lists
+
+my @d = <a c e g i>;
+my $pos = finds(@d,"d");
+if $pos {
+    say "Found at $pos";
+}
+else {
+    inserts(@d,"d",:$pos);
+}
+say @d;  # (a c d e g i)
 ```
 
 Insert the given object (the second argument) into the correct location in the given array (the first argument). Takes a named argument `cmp` to indicate the logic that should be used to determine order (defaults to &infix:<cmp>). Additionally takes array, object arguments to insert the given object in the associated array at the same location. Returns the position at which the object(s) were actually inserted.
+
+Can also take an optional named argument `pos` from a previously unsuccessful call to `finds` as a shortcut to prevent needing to search for the object again.
 
 finds
 -----
