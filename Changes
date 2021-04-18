@@ -2,6 +2,10 @@ Revision history for Array::Sorted::Util
 
 {{$NEXT}}
 
+0.0.3  2021-04-18T18:50:43+02:00
+    - use "array[str] \a" instead of "str @a" in signatures to
+      get around slowdown of https://github.com/rakudo/rakudo/issues/4097
+
 0.0.2  2021-04-17T19:23:36+02:00
     - Fix signature on one of the native deletes candidates
     - Add support for :pos to inserts, to prevent re-searching

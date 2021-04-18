@@ -57,79 +57,79 @@ my #type# @delete_#postfix#;
 #-------------------------------------------------------------------------------
 # Publicly visible #type# candidates
 
-my multi sub finds(#type# @a, #Type#:D $needle) {
-    finds_#postfix#(@a, $needle)
+my multi sub finds(array[#type#] \a, #Type#:D $needle) {
+    finds_#postfix#(a, $needle)
 }
-my multi sub finds(#type# @a, #Type#:D $needle, :&cmp!) {
-    finds_#postfix#_cmp(@a, $needle, &cmp)
-}
-
-my multi sub inserts(#type# @a, #Type#:D $needle, NotFound :$pos!) {
-    inserts_#postfix#(@a, $needle, $pos, True)
-}
-my multi sub inserts(#type# @a, #Type#:D $needle, :$force) {
-    inserts_#postfix#(@a, $needle, finds_#postfix#(@a, $needle), $force.Bool)
+my multi sub finds(array[#type#] \a, #Type#:D $needle, :&cmp!) {
+    finds_#postfix#_cmp(a, $needle, &cmp)
 }
 
-my multi sub inserts(#type# @a, #Type#:D $needle, **@also, NotFound :$pos!) {
-    inserts_#postfix#(@a, $needle, $pos, True);
+my multi sub inserts(array[#type#] \a, #Type#:D $needle, NotFound :$pos!) {
+    inserts_#postfix#(a, $needle, $pos, True)
+}
+my multi sub inserts(array[#type#] \a, #Type#:D $needle, :$force) {
+    inserts_#postfix#(a, $needle, finds_#postfix#(a, $needle), $force.Bool)
+}
+
+my multi sub inserts(array[#type#] \a, #Type#:D $needle, **@also, NotFound :$pos!) {
+    inserts_#postfix#(a, $needle, $pos, True);
     insert-also($pos, @also)
 }
-my multi sub inserts(#type# @a, #Type#:D $needle, **@also, :$force) {
-    nqp::eqaddr((my $i := inserts(@a, $needle, :$force)),Nil)
+my multi sub inserts(array[#type#] \a, #Type#:D $needle, **@also, :$force) {
+    nqp::eqaddr((my $i := inserts(a, $needle, :$force)),Nil)
       ?? $i
       !! insert-also($i, @also)
 }
 
-my multi sub inserts(#type# @a, #Type#:D $needle, :&cmp!, :$force) {
-    inserts_#postfix#(@a, $needle, finds_#postfix#_cmp(@a, $needle, &cmp), $force.Bool)
+my multi sub inserts(array[#type#] \a, #Type#:D $needle, :&cmp!, :$force) {
+    inserts_#postfix#(a, $needle, finds_#postfix#_cmp(a, $needle, &cmp), $force.Bool)
 }
-my multi sub inserts(#type# @a, #Type#:D $needle, **@also, :&cmp = &[cmp], :$force) {
-    nqp::eqaddr((my $i := inserts_#postfix#(@a, $needle, :&cmp, :$force)),Nil)
+my multi sub inserts(array[#type#] \a, #Type#:D $needle, **@also, :&cmp = &[cmp], :$force) {
+    nqp::eqaddr((my $i := inserts_#postfix#(a, $needle, :&cmp, :$force)),Nil)
       ?? $i
       !! insert-also($i, @also)
 }
 
-my multi sub deletes(#type# @a, #Type#:D $needle) {
+my multi sub deletes(array[#type#] \a, #Type#:D $needle) {
     nqp::if(
-      nqp::istype((my $i := finds_#postfix#(@a, $needle)),NotFound),
+      nqp::istype((my $i := finds_#postfix#(a, $needle)),NotFound),
       Nil,
       nqp::stmts(
-        nqp::splice(@a,@delete_#postfix#,$i,1),
+        nqp::splice(a,@delete_#postfix#,$i,1),
         $needle
       )
     )
 }
-my multi sub deletes(#type# @a, #Type#:D $needle, **@also) {
+my multi sub deletes(array[#type#] \a, #Type#:D $needle, **@also) {
     nqp::if(
-      nqp::istype((my $i := finds_#postfix#(@a, $needle)),NotFound),
+      nqp::istype((my $i := finds_#postfix#(a, $needle)),NotFound),
       Nil,
       nqp::stmts(
-        nqp::splice(@a,@delete_#postfix#,$i,1),
+        nqp::splice(a,@delete_#postfix#,$i,1),
         delete-also($i, @also),
         $needle
       )
     )
 }
-my multi sub deletes(#type# @a, #Type#:D $needle, :&cmp!) {
+my multi sub deletes(array[#type#] \a, #Type#:D $needle, :&cmp!) {
     nqp::if(
       nqp::istype(
-        (my $i := finds_#postfix#_cmp(@a, $needle, &cmp)),
+        (my $i := finds_#postfix#_cmp(a, $needle, &cmp)),
         NotFound
       ),
       Nil,
       nqp::stmts(
-        nqp::splice(@a,@delete_#postfix#,$i,1),
+        nqp::splice(a,@delete_#postfix#,$i,1),
         $needle
       )
     )
 }
-my multi sub deletes(#type# @a, #Type#:D $needle, **@also, :&cmp!) {
+my multi sub deletes(array[#type#] \a, #Type#:D $needle, **@also, :&cmp!) {
     nqp::if(
-      nqp::istype((my $i := finds_#postfix#_cmp(@a, $needle, &cmp)),NotFound),
+      nqp::istype((my $i := finds_#postfix#_cmp(a, $needle, &cmp)),NotFound),
       Nil,
       nqp::stmts(
-        nqp::splice(@a,@delete_#postfix#,$i,1),
+        nqp::splice(a,@delete_#postfix#,$i,1),
         delete-also($i, @also),
         $needle
       )
@@ -139,15 +139,15 @@ my multi sub deletes(#type# @a, #Type#:D $needle, **@also, :&cmp!) {
 #-------------------------------------------------------------------------------
 # Actual #type# workhorses
 
-my sub finds_#postfix#(#type# @a, #type# $needle) {
+my sub finds_#postfix#(array[#type#] \a, #type# $needle) {
     my int $start;
-    my int $end = nqp::sub_i(nqp::elems(@a),1);
-    my int $i   = nqp::div_i(nqp::elems(@a),2);
+    my int $end = nqp::sub_i(nqp::elems(a),1);
+    my int $i   = nqp::div_i(nqp::elems(a),2);
 
     nqp::while(
       nqp::isge_i($i,$start) && nqp::isle_i($i,$end),  # not done yet
       nqp::if(
-        (my int $cmp = nqp::cmp_#postfix#($needle,nqp::atpos_#postfix#(@a,$i))),
+        (my int $cmp = nqp::cmp_#postfix#($needle,nqp::atpos_#postfix#(a,$i))),
         nqp::if(                                       # not same
           nqp::islt_i($cmp,0),
           nqp::stmts(                                  # needle is less
@@ -172,7 +172,7 @@ my sub finds_#postfix#(#type# @a, #type# $needle) {
         nqp::stmts(                                    # needle found
           nqp::while(                                  # find first occurrence
             nqp::isge_i(($i = nqp::sub_i($i,1)),0)
-              && nqp::iseq_#postfix#($needle,nqp::atpos_#postfix#(@a,$i)),
+              && nqp::iseq_#postfix#($needle,nqp::atpos_#postfix#(a,$i)),
             nqp::null
           ),
           (return nqp::add_i($i,1))
@@ -184,16 +184,16 @@ my sub finds_#postfix#(#type# @a, #type# $needle) {
     nqp::box_i($i,NotFound)
 }
 
-my sub finds_#postfix#_cmp(#type# @a, #type# $needle, &cmp) {
+my sub finds_#postfix#_cmp(array[#type#] \a, #type# $needle, &cmp) {
     my int $start;
-    my int $end = nqp::sub_i(nqp::elems(@a),1);
-    my int $i   = nqp::div_i(nqp::elems(@a),2);
+    my int $end = nqp::sub_i(nqp::elems(a),1);
+    my int $i   = nqp::div_i(nqp::elems(a),2);
 
     nqp::while(
       nqp::isge_i($i,$start) && nqp::isle_i($i,$end),  # not done yet
       nqp::if(
         nqp::eqaddr(
-          (my $cmp := cmp($needle,nqp::atpos_#postfix#(@a,$i))),
+          (my $cmp := cmp($needle,nqp::atpos_#postfix#(a,$i))),
           Order::Less
         ),
         nqp::stmts(                                    # needle is less
@@ -219,7 +219,7 @@ my sub finds_#postfix#_cmp(#type# @a, #type# $needle, &cmp) {
           nqp::stmts(                                  # found needle
             nqp::while(                                # find first occurrence
               nqp::isge_i(($i = nqp::sub_i($i,1)),0)
-                && nqp::iseq_s($needle,nqp::atpos_#postfix#(@a,$i)),
+                && nqp::iseq_s($needle,nqp::atpos_#postfix#(a,$i)),
               nqp::null
             ),
             (return nqp::add_i($i,1))
@@ -232,12 +232,12 @@ my sub finds_#postfix#_cmp(#type# @a, #type# $needle, &cmp) {
     nqp::box_i($i,NotFound)
 }
 
-my sub inserts_#postfix#(#type# @a, #type# $needle, Int:D $i, int $force) {
+my sub inserts_#postfix#(array[#type#] \a, #type# $needle, Int:D $i, int $force) {
     nqp::bindpos_#postfix#(@insert_#postfix#,0,$needle);
     nqp::if(
       nqp::istype($i,NotFound),
       nqp::stmts(                                       # not found
-        nqp::splice(@a,@insert_#postfix#,$i,0),
+        nqp::splice(a,@insert_#postfix#,$i,0),
         nqp::box_i($i,Int)
       ),
       nqp::if(                                          # found
@@ -245,11 +245,11 @@ my sub inserts_#postfix#(#type# @a, #type# $needle, Int:D $i, int $force) {
         nqp::stmts(                                     # force insertion
           (my int $j = $i),
           nqp::while(                                   # insert after last
-            nqp::islt_i(($j = nqp::add_i($j,1)),nqp::elems(@a))
-              && nqp::iseq_s($needle,nqp::atpos_#postfix#(@a,$j)),
+            nqp::islt_i(($j = nqp::add_i($j,1)),nqp::elems(a))
+              && nqp::iseq_s($needle,nqp::atpos_#postfix#(a,$j)),
             nqp::null
           ),
-          nqp::splice(@a,@insert_#postfix#,$j,0),
+          nqp::splice(a,@insert_#postfix#,$j,0),
           $j
         )
       )
