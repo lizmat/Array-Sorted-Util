@@ -1,4 +1,4 @@
-unit module Array::Sorted::Util:ver<0.0.3>:auth<cpan:ELIZABETH>;
+unit module Array::Sorted::Util:ver<0.0.4>:auth<cpan:ELIZABETH>;
 
 # This modules is prepared to be incorporated into the Rakudo core,
 # so it set up to be as performant as possible already using nqp ops.
@@ -837,7 +837,7 @@ sorted arrays.
 my @a;
 my $pos = inserts(@a, "foo", :cmp(&[coll]));
 
-inserts(@a, "foo");  # use &infix:<cmp> by default
+inserts(@a, "foo");  # use infix:<cmp> by default
 
 my @b;
 my @c;
@@ -858,7 +858,7 @@ say @d;  # (a c d e g i)
 Insert the given object (the second argument) into the correct location in
 the given array (the first argument).  Takes a named argument C<cmp> to
 indicate the logic that should be used to determine order (defaults
-to &infix:<cmp>).  Additionally takes array, object arguments to insert
+to C<infix:<cmp>>).  Additionally takes array, object arguments to insert
 the given object in the associated array at the same location.  Returns the
 position at which the object(s) were actually inserted.
 
@@ -871,7 +871,7 @@ again.
 =begin code :lang<raku>
 
 my @a = <a b c d e f g h i j>;
-.say with finds(@a, "h");   # 7, use &infix:<cmp> by default
+.say with finds(@a, "h");   # 7, use infix:<cmp> by default
 say "could not be found" without finds(@a, "z", :cmp(&[coll]));
 
 =end code
@@ -879,7 +879,7 @@ say "could not be found" without finds(@a, "z", :cmp(&[coll]));
 Attempt to find the given object (the second argument) in the given
 sorted array (the first argument).  Takes a named argument C<cmp> to
 indicate the logic that should be used to determine order (defaults
-to &infix:<cmp>).  Returns a special B<undefined> value if the object
+to C<infix:<cmp>>).  Returns a special B<undefined> value if the object
 could not be found.
 
 =head2 deletes
@@ -895,7 +895,7 @@ say deletes(@a, "z", :cmp(&[coll]));  # Nil
 Attempt to remove the given object (the second argument) from the given
 sorted array (the first argument).  Takes a named argument C<cmp> to
 indicate the logic that should be used to determine order (defaults
-to &infix:<cmp>).  Additionally takes array arguments to delete elements
+to C<infix:<cmp>>).  Additionally takes array arguments to delete elements
 in the associated array at the same location.  Returns the value of
 the primary removed object.
 

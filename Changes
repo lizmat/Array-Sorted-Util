@@ -2,6 +2,7 @@ Revision history for Array::Sorted::Util
 
 {{$NEXT}}
     - Fix improper rendering of some native comparisons
+    - Some pod rendering fixes, raydiak++
 
 0.0.3  2021-04-18T18:50:43+02:00
     - Use "array[str] \a" instead of "str @a" in signatures to
