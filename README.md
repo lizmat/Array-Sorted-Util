@@ -54,7 +54,7 @@ else {
 say @d;  # (a c d e g i)
 ```
 
-Insert the given object (the second argument) into the correct location in the given array (the first argument). Takes a named argument `cmp` to indicate the logic that should be used to determine order (defaults to &infix:<cmp>). Additionally takes array, object arguments to insert the given object in the associated array at the same location. Returns the position at which the object(s) were actually inserted.
+Insert the given object (the second argument) into the correct location in the given array (the first argument). Takes a named argument `cmp` to indicate the logic that should be used to determine order (defaults to `&infix:<cmp>`). Additionally takes array, object arguments to insert the given object in the associated array at the same location. Returns the position at which the object(s) were actually inserted.
 
 Can also take an optional named argument `pos` from a previously unsuccessful call to `finds` as a shortcut to prevent needing to search for the object again.
 
@@ -67,7 +67,7 @@ my @a = <a b c d e f g h i j>;
 say "could not be found" without finds(@a, "z", :cmp(&[coll]));
 ```
 
-Attempt to find the given object (the second argument) in the given sorted array (the first argument). Takes a named argument `cmp` to indicate the logic that should be used to determine order (defaults to &infix:<cmp>). Returns a special **undefined** value if the object could not be found.
+Attempt to find the given object (the second argument) in the given sorted array (the first argument). Takes a named argument `cmp` to indicate the logic that should be used to determine order (defaults to `&infix:<cmp>`). Returns a special **undefined** value if the object could not be found.
 
 deletes
 -------
@@ -78,7 +78,7 @@ say deletes(@a, "e");                 # e, use &infix:<cmp> by default
 say deletes(@a, "z", :cmp(&[coll]));  # Nil
 ```
 
-Attempt to remove the given object (the second argument) from the given sorted array (the first argument). Takes a named argument `cmp` to indicate the logic that should be used to determine order (defaults to &infix:<cmp>). Additionally takes array arguments to delete elements in the associated array at the same location. Returns the value of the primary removed object.
+Attempt to remove the given object (the second argument) from the given sorted array (the first argument). Takes a named argument `cmp` to indicate the logic that should be used to determine order (defaults to `&infix:<cmp>`). Additionally takes array arguments to delete elements in the associated array at the same location. Returns the value of the primary removed object.
 
 INSPIRATION
 ===========
