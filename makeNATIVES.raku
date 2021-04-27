@@ -219,7 +219,7 @@ my sub finds_#postfix#_cmp(array[#type#] \a, #type# $needle, &cmp) {
           nqp::stmts(                                  # found needle
             nqp::while(                                # find first occurrence
               nqp::isge_i(($i = nqp::sub_i($i,1)),0)
-                && nqp::iseq_s($needle,nqp::atpos_#postfix#(a,$i)),
+                && nqp::iseq_#postfix#($needle,nqp::atpos_#postfix#(a,$i)),
               nqp::null
             ),
             (return nqp::add_i($i,1))
@@ -246,7 +246,7 @@ my sub inserts_#postfix#(array[#type#] \a, #type# $needle, Int:D $i, int $force)
           (my int $j = $i),
           nqp::while(                                   # insert after last
             nqp::islt_i(($j = nqp::add_i($j,1)),nqp::elems(a))
-              && nqp::iseq_s($needle,nqp::atpos_#postfix#(a,$j)),
+              && nqp::iseq_#postfix#($needle,nqp::atpos_#postfix#(a,$j)),
             nqp::null
           ),
           nqp::splice(a,@insert_#postfix#,$j,0),

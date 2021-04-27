@@ -166,7 +166,7 @@ my multi sub delete(@a, \pos) {
 }
 
 #- start of generated part of str candidates -----------------------------------
-#- Generated on 2021-04-18T18:48:54+02:00 by ./makeNATIVES.raku
+#- Generated on 2021-04-27T13:33:06+02:00 by ./makeNATIVES.raku
 #- PLEASE DON'T CHANGE ANYTHING BELOW THIS LINE
 my str @insert_s;
 my str @delete_s;
@@ -377,7 +377,7 @@ my sub inserts_s(array[str] \a, str $needle, Int:D $i, int $force) {
 #- end of generated part of str candidates -------------------------------------
 
 #- start of generated part of int candidates -----------------------------------
-#- Generated on 2021-04-18T18:48:54+02:00 by ./makeNATIVES.raku
+#- Generated on 2021-04-27T13:33:06+02:00 by ./makeNATIVES.raku
 #- PLEASE DON'T CHANGE ANYTHING BELOW THIS LINE
 my int @insert_i;
 my int @delete_i;
@@ -547,7 +547,7 @@ my sub finds_i_cmp(array[int] \a, int $needle, &cmp) {
           nqp::stmts(                                  # found needle
             nqp::while(                                # find first occurrence
               nqp::isge_i(($i = nqp::sub_i($i,1)),0)
-                && nqp::iseq_s($needle,nqp::atpos_i(a,$i)),
+                && nqp::iseq_i($needle,nqp::atpos_i(a,$i)),
               nqp::null
             ),
             (return nqp::add_i($i,1))
@@ -574,7 +574,7 @@ my sub inserts_i(array[int] \a, int $needle, Int:D $i, int $force) {
           (my int $j = $i),
           nqp::while(                                   # insert after last
             nqp::islt_i(($j = nqp::add_i($j,1)),nqp::elems(a))
-              && nqp::iseq_s($needle,nqp::atpos_i(a,$j)),
+              && nqp::iseq_i($needle,nqp::atpos_i(a,$j)),
             nqp::null
           ),
           nqp::splice(a,@insert_i,$j,0),
@@ -588,7 +588,7 @@ my sub inserts_i(array[int] \a, int $needle, Int:D $i, int $force) {
 #- end of generated part of int candidates -------------------------------------
 
 #- start of generated part of num candidates -----------------------------------
-#- Generated on 2021-04-18T18:48:54+02:00 by ./makeNATIVES.raku
+#- Generated on 2021-04-27T13:33:06+02:00 by ./makeNATIVES.raku
 #- PLEASE DON'T CHANGE ANYTHING BELOW THIS LINE
 my num @insert_n;
 my num @delete_n;
@@ -758,7 +758,7 @@ my sub finds_n_cmp(array[num] \a, num $needle, &cmp) {
           nqp::stmts(                                  # found needle
             nqp::while(                                # find first occurrence
               nqp::isge_i(($i = nqp::sub_i($i,1)),0)
-                && nqp::iseq_s($needle,nqp::atpos_n(a,$i)),
+                && nqp::iseq_n($needle,nqp::atpos_n(a,$i)),
               nqp::null
             ),
             (return nqp::add_i($i,1))
@@ -785,7 +785,7 @@ my sub inserts_n(array[num] \a, num $needle, Int:D $i, int $force) {
           (my int $j = $i),
           nqp::while(                                   # insert after last
             nqp::islt_i(($j = nqp::add_i($j,1)),nqp::elems(a))
-              && nqp::iseq_s($needle,nqp::atpos_n(a,$j)),
+              && nqp::iseq_n($needle,nqp::atpos_n(a,$j)),
             nqp::null
           ),
           nqp::splice(a,@insert_n,$j,0),
