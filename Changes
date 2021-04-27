@@ -1,6 +1,8 @@
 Revision history for Array::Sorted::Util
 
 {{$NEXT}}
+
+0.0.4  2021-04-27T13:53:13+02:00
     - Fix improper rendering of some native comparisons
     - Some pod rendering fixes, raydiak++
 
