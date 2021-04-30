@@ -69,6 +69,28 @@ say "could not be found" without finds(@a, "z", :cmp(&[coll]));
 
 Attempt to find the given object (the second argument) in the given sorted array (the first argument). Takes a named argument `cmp` to indicate the logic that should be used to determine order (defaults to `infix:<cmp>`). Returns a special **undefined** value if the object could not be found.
 
+nexts
+-----
+
+```raku
+my @a = <a b c d e f g h i j>;
+say nexts(@a, "g");  # h
+say nexts(@a, "j");  # Nil
+```
+
+Return the object **after** the given object (the second argument) in the given sorted array (the first argument). Takes a named argument `cmp` to indicate the logic that should be used to determine order (defaults to `infix:<cmp>`). Returns Nil if no object could be found.
+
+prevs
+-----
+
+```raku
+my @a = <a b c d e f g h i j>;
+say prevs(@a, "g");  # f
+say prevs(@a, "a");  # Nil
+```
+
+Return the object **before** the given object (the second argument) in the given sorted array (the first argument). Takes a named argument `cmp` to indicate the logic that should be used to determine order (defaults to `infix:<cmp>`). Returns Nil if no object could be found.
+
 deletes
 -------
 

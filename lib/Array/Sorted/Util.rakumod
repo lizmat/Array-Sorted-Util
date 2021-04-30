@@ -1,4 +1,4 @@
-unit module Array::Sorted::Util:ver<0.0.4>:auth<cpan:ELIZABETH>;
+unit module Array::Sorted::Util:ver<0.0.5>:auth<cpan:ELIZABETH>;
 
 # This modules is prepared to be incorporated into the Rakudo core,
 # so it set up to be as performant as possible already using nqp ops.
@@ -15,6 +15,21 @@ my proto sub deletes(|) is export {*}
 
 my proto sub insert(|) {*}
 my proto sub delete(|) {*}
+
+my sub nexts(\sorted, \needle, :&cmp) is export {
+    my $pos = &cmp
+      ?? finds(sorted, needle, :&cmp)
+      !! finds(sorted, needle);
+    ++$pos if $pos.defined;
+    $pos < sorted ?? sorted[$pos] !! Nil
+}
+
+my sub prevs(\sorted, \needle, :&cmp) is export {
+    my $pos = &cmp
+      ?? finds(sorted, needle, :&cmp)
+      !! finds(sorted, needle);
+    $pos > 0 ?? sorted[$pos - 1] !! Nil
+}
 
 #-------------------------------------------------------------------------------
 # Publicly visible opaque candidates
@@ -882,6 +897,36 @@ indicate the logic that should be used to determine order (defaults
 to C<infix:<cmp>>).  Returns a special B<undefined> value if the object
 could not be found.
 
+=head2 nexts
+
+=begin code :lang<raku>
+
+my @a = <a b c d e f g h i j>;
+say nexts(@a, "g");  # h
+say nexts(@a, "j");  # Nil
+
+=end code
+
+Return the object B<after> the given object (the second argument) in the
+given sorted array (the first argument).  Takes a named argument C<cmp> to
+indicate the logic that should be used to determine order (defaults to
+C<infix:<cmp>>).  Returns Nil if no object could be found.
+
+=head2 prevs
+
+=begin code :lang<raku>
+
+my @a = <a b c d e f g h i j>;
+say prevs(@a, "g");  # f
+say prevs(@a, "a");  # Nil
+
+=end code
+
+Return the object B<before> the given object (the second argument) in the
+given sorted array (the first argument).  Takes a named argument C<cmp> to
+indicate the logic that should be used to determine order (defaults to
+C<infix:<cmp>>).  Returns Nil if no object could be found.
+
 =head2 deletes
 
 =begin code :lang<raku>
@@ -911,8 +956,8 @@ See https://files.eric.ed.gov/fulltext/ED208879.pdf for more information
 
 Elizabeth Mattijsen <liz@wenzperl.nl>
 
-Source can be located at: https://github.com/lizmat/Array-Sorted-Util . Comments and
-Pull Requests are welcome.
+Source can be located at: https://github.com/lizmat/Array-Sorted-Util .
+Comments and Pull Requests are welcome.
 
 =head1 COPYRIGHT AND LICENSE
 

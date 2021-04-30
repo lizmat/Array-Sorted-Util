@@ -5,7 +5,7 @@ plan 4;
 
 subtest "finds / deletes on simple letter array" =>  {
     my str @a = <a b c d e f g h i j>;
-    plan 4 * @a + 7;
+    plan 4 * @a + 11;
 
     for @a.kv -> $i, $letter {
         is finds(@a, $letter), $i, "did we find '$letter'";
@@ -26,6 +26,12 @@ subtest "finds / deletes on simple letter array" =>  {
         nok $index.defined, "did the search for '$letter' fail";
         is $index.Int, $pos, "did it give insert location $index";
     }
+
+    is-deeply nexts(@a, @a[1]), @a[2], 'does nexts find the next';
+    is-deeply nexts(@a, @a[9]), Nil,   'does nexts handles end ok';
+
+    is-deeply prevs(@a, @a[1]), @a[0], 'does prevs find the previous';
+    is-deeply prevs(@a, @a[0]), Nil,   'does prevs handles end ok';
 
     for @a.clone.pick(*) {
         is-deeply deletes(@a,$_), $_, "did '$_' get deleted";
