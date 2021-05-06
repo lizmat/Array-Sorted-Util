@@ -1,4 +1,4 @@
-unit module Array::Sorted::Util:ver<0.0.5>:auth<cpan:ELIZABETH>;
+unit module Array::Sorted::Util:ver<0.0.6>:auth<cpan:ELIZABETH>;
 
 # This modules is prepared to be incorporated into the Rakudo core,
 # so it set up to be as performant as possible already using nqp ops.
@@ -181,9 +181,8 @@ my multi sub delete(@a, \pos) {
 }
 
 #- start of generated part of str candidates -----------------------------------
-#- Generated on 2021-04-27T13:33:06+02:00 by ./makeNATIVES.raku
+#- Generated on 2021-05-06T12:15:03+02:00 by ./makeNATIVES.raku
 #- PLEASE DON'T CHANGE ANYTHING BELOW THIS LINE
-my str @insert_s;
 my str @delete_s;
 
 #-------------------------------------------------------------------------------
@@ -365,11 +364,11 @@ my sub finds_s_cmp(array[str] \a, str $needle, &cmp) {
 }
 
 my sub inserts_s(array[str] \a, str $needle, Int:D $i, int $force) {
-    nqp::bindpos_s(@insert_s,0,$needle);
+    my str @insert = $needle;
     nqp::if(
       nqp::istype($i,NotFound),
       nqp::stmts(                                       # not found
-        nqp::splice(a,@insert_s,$i,0),
+        nqp::splice(a,@insert,$i,0),
         nqp::box_i($i,Int)
       ),
       nqp::if(                                          # found
@@ -381,7 +380,7 @@ my sub inserts_s(array[str] \a, str $needle, Int:D $i, int $force) {
               && nqp::iseq_s($needle,nqp::atpos_s(a,$j)),
             nqp::null
           ),
-          nqp::splice(a,@insert_s,$j,0),
+          nqp::splice(a,@insert,$j,0),
           $j
         )
       )
@@ -392,9 +391,8 @@ my sub inserts_s(array[str] \a, str $needle, Int:D $i, int $force) {
 #- end of generated part of str candidates -------------------------------------
 
 #- start of generated part of int candidates -----------------------------------
-#- Generated on 2021-04-27T13:33:06+02:00 by ./makeNATIVES.raku
+#- Generated on 2021-05-06T12:15:03+02:00 by ./makeNATIVES.raku
 #- PLEASE DON'T CHANGE ANYTHING BELOW THIS LINE
-my int @insert_i;
 my int @delete_i;
 
 #-------------------------------------------------------------------------------
@@ -576,11 +574,11 @@ my sub finds_i_cmp(array[int] \a, int $needle, &cmp) {
 }
 
 my sub inserts_i(array[int] \a, int $needle, Int:D $i, int $force) {
-    nqp::bindpos_i(@insert_i,0,$needle);
+    my int @insert = $needle;
     nqp::if(
       nqp::istype($i,NotFound),
       nqp::stmts(                                       # not found
-        nqp::splice(a,@insert_i,$i,0),
+        nqp::splice(a,@insert,$i,0),
         nqp::box_i($i,Int)
       ),
       nqp::if(                                          # found
@@ -592,7 +590,7 @@ my sub inserts_i(array[int] \a, int $needle, Int:D $i, int $force) {
               && nqp::iseq_i($needle,nqp::atpos_i(a,$j)),
             nqp::null
           ),
-          nqp::splice(a,@insert_i,$j,0),
+          nqp::splice(a,@insert,$j,0),
           $j
         )
       )
@@ -603,9 +601,8 @@ my sub inserts_i(array[int] \a, int $needle, Int:D $i, int $force) {
 #- end of generated part of int candidates -------------------------------------
 
 #- start of generated part of num candidates -----------------------------------
-#- Generated on 2021-04-27T13:33:06+02:00 by ./makeNATIVES.raku
+#- Generated on 2021-05-06T12:15:03+02:00 by ./makeNATIVES.raku
 #- PLEASE DON'T CHANGE ANYTHING BELOW THIS LINE
-my num @insert_n;
 my num @delete_n;
 
 #-------------------------------------------------------------------------------
@@ -787,11 +784,11 @@ my sub finds_n_cmp(array[num] \a, num $needle, &cmp) {
 }
 
 my sub inserts_n(array[num] \a, num $needle, Int:D $i, int $force) {
-    nqp::bindpos_n(@insert_n,0,$needle);
+    my num @insert = $needle;
     nqp::if(
       nqp::istype($i,NotFound),
       nqp::stmts(                                       # not found
-        nqp::splice(a,@insert_n,$i,0),
+        nqp::splice(a,@insert,$i,0),
         nqp::box_i($i,Int)
       ),
       nqp::if(                                          # found
@@ -803,7 +800,7 @@ my sub inserts_n(array[num] \a, num $needle, Int:D $i, int $force) {
               && nqp::iseq_n($needle,nqp::atpos_n(a,$j)),
             nqp::null
           ),
-          nqp::splice(a,@insert_n,$j,0),
+          nqp::splice(a,@insert,$j,0),
           $j
         )
       )

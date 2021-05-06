@@ -51,7 +51,6 @@ while @lines {
 
     # spurt the role
     say Q:to/SOURCE/.subst(/ '#' (\w+) '#' /, -> $/ { %mapper{$0} }, :g).chomp;
-my #type# @insert_#postfix#;
 my #type# @delete_#postfix#;
 
 #-------------------------------------------------------------------------------
@@ -233,11 +232,11 @@ my sub finds_#postfix#_cmp(array[#type#] \a, #type# $needle, &cmp) {
 }
 
 my sub inserts_#postfix#(array[#type#] \a, #type# $needle, Int:D $i, int $force) {
-    nqp::bindpos_#postfix#(@insert_#postfix#,0,$needle);
+    my #type# @insert = $needle;
     nqp::if(
       nqp::istype($i,NotFound),
       nqp::stmts(                                       # not found
-        nqp::splice(a,@insert_#postfix#,$i,0),
+        nqp::splice(a,@insert,$i,0),
         nqp::box_i($i,Int)
       ),
       nqp::if(                                          # found
@@ -249,7 +248,7 @@ my sub inserts_#postfix#(array[#type#] \a, #type# $needle, Int:D $i, int $force)
               && nqp::iseq_#postfix#($needle,nqp::atpos_#postfix#(a,$j)),
             nqp::null
           ),
-          nqp::splice(a,@insert_#postfix#,$j,0),
+          nqp::splice(a,@insert,$j,0),
           $j
         )
       )
