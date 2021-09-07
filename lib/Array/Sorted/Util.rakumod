@@ -1,4 +1,4 @@
-unit module Array::Sorted::Util:ver<0.0.6>:auth<cpan:ELIZABETH>;
+unit module Array::Sorted::Util:ver<0.0.7>:auth<zef:lizmat>;
 
 # This modules is prepared to be incorporated into the Rakudo core,
 # so it set up to be as performant as possible already using nqp ops.
@@ -951,7 +951,7 @@ See https://files.eric.ed.gov/fulltext/ED208879.pdf for more information
 
 =head1 AUTHOR
 
-Elizabeth Mattijsen <liz@wenzperl.nl>
+Elizabeth Mattijsen <liz@raku.rocks>
 
 Source can be located at: https://github.com/lizmat/Array-Sorted-Util .
 Comments and Pull Requests are welcome.

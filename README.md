@@ -112,7 +112,7 @@ See https://files.eric.ed.gov/fulltext/ED208879.pdf for more information (pages 
 AUTHOR
 ======
 
-Elizabeth Mattijsen <liz@wenzperl.nl>
+Elizabeth Mattijsen <liz@raku.rocks>
 
 Source can be located at: https://github.com/lizmat/Array-Sorted-Util . Comments and Pull Requests are welcome.
 
