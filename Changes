@@ -1,10 +1,12 @@
 Revision history for Array::Sorted::Util
 
 {{$NEXT}}
+    - Transparently allow IterationBuffers to be used as haystacks
+      as well.
 
 0.0.7  2021-09-08T00:47:25+02:00
     - Move to the zef ecosystem
-    - Update emaiol address
+    - Update email address
 
 0.0.6  2021-05-06T12:28:37+02:00
     - Fix race condition on inserts on native arrays

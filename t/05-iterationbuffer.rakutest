@@ -1,0 +1,62 @@
+use Test;
+use Array::Sorted::Util;
+
+plan 3;
+
+my $instants := IterationBuffer.new;
+for ^10 {
+    $instants.push(now);
+    sleep .1;
+}
+
+subtest "finds on simple Instant IterationBuffer" =>  {
+    my $buf := $instants.clone;
+    plan $buf.elems + 6;
+
+    for $buf.List.kv -> $i, $instant {
+        is finds($buf, $instant), $i, "did we find '$instant'";
+    }
+
+    for Instant.from-posix(0), Instant.from-posix(time + 100) {
+        nok finds($buf, $_).defined, "did we not find '$_'";
+    }
+
+    is-deeply nexts($buf, $buf[1]), $buf[2], 'does nexts find the next';
+    is-deeply nexts($buf, $buf[9]), Nil,     'does nexts handles end ok';
+
+    is-deeply prevs($buf, $buf[1]), $buf[0], 'does prevs find the previous';
+    is-deeply prevs($buf, $buf[0]), Nil,     'does prevs handles end ok';
+}
+
+subtest "inserts on an empty IterationBuffer" => {
+    my $buf-a := $instants.clone;
+    my $buf-b := IterationBuffer.new;
+
+    plan $buf-a.elems + 2;
+
+    for $buf-a.List.kv -> $i, $value {
+        is inserts($buf-b, $value).Int, $i, "inserted ok at $i";
+    }
+    is-deeply $buf-b, $buf-a, "did we get a correctly sorted buffer (1)";
+
+    inserts($buf-b, $_) for $buf-a.List.pick(*);
+    is-deeply $buf-b, $buf-a, "did we get a correctly sorted buffer (2)";
+}
+
+subtest "deletes on an IterationBuffer" => {
+    my $buf := $instants.clone;
+
+    plan $buf.elems + 2;
+
+    for $instants.List.pick(*) {
+        is-deeply deletes($buf, $_), $_, "did '$_' get deleted";
+    }
+    is $buf.elems, 0, "did we empty out the IterationBuffer";
+
+    for $instants.List.pick(*) -> $instant {
+        inserts($buf, $instant, :pos($_)) without finds($buf, $instant);
+    }
+    is-deeply $buf, $instants, "did we get a correctly sorted buffer (3)";
+}
+
+# vim: expandtab shiftwidth=4

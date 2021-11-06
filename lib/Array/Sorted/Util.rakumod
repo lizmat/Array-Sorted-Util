@@ -1,10 +1,11 @@
-unit module Array::Sorted::Util:ver<0.0.7>:auth<zef:lizmat>;
-
 # This modules is prepared to be incorporated into the Rakudo core,
 # so it set up to be as performant as possible already using nqp ops.
 use nqp;
 
-my class NotFound is Int {
+# An empty list for nqp::splice to delete stuff
+my $empty-list := nqp::list;
+
+my class NotFound is Int {  # is implementation-detail
     method defined(--> False) { }
     method Int() { nqp::box_i(self,Int) }
 }
@@ -16,27 +17,27 @@ my proto sub deletes(|) is export {*}
 my proto sub insert(|) {*}
 my proto sub delete(|) {*}
 
-my sub nexts(\sorted, \needle, :&cmp) is export {
+my sub nexts(\haystack, \needle, :&cmp) is export {
     my $pos = &cmp
-      ?? finds(sorted, needle, :&cmp)
-      !! finds(sorted, needle);
+      ?? finds(haystack, needle, :&cmp)
+      !! finds(haystack, needle);
     ++$pos if $pos.defined;
-    $pos < sorted ?? sorted[$pos] !! Nil
+    $pos < haystack.elems ?? haystack.AT-POS($pos) !! Nil
 }
 
-my sub prevs(\sorted, \needle, :&cmp) is export {
+my sub prevs(\haystack, \needle, :&cmp) is export {
     my $pos = &cmp
-      ?? finds(sorted, needle, :&cmp)
-      !! finds(sorted, needle);
-    $pos > 0 ?? sorted[$pos - 1] !! Nil
+      ?? finds(haystack, needle, :&cmp)
+      !! finds(haystack, needle);
+    $pos > 0 ?? haystack.AT-POS($pos - 1) !! Nil
 }
 
 #-------------------------------------------------------------------------------
 # Publicly visible opaque candidates
 
-my multi sub finds(@a, $needle, :&cmp = &[cmp]) {
+my multi sub finds(\haystack, $needle, :&cmp = &[cmp]) {
     my int $start;
-    my int $elems = @a.elems;   # reifies
+    my int $elems = haystack.elems;   # reifies
     my int $end   = nqp::sub_i($elems,1);
     my int $i     = nqp::div_i($elems,2);
 
@@ -44,7 +45,7 @@ my multi sub finds(@a, $needle, :&cmp = &[cmp]) {
       nqp::isge_i($i,$start) && nqp::isle_i($i,$end),  # not done yet
       nqp::if(
         nqp::eqaddr(
-          (my $cmp := cmp($needle,@a.AT-POS($i))),
+          (my $cmp := cmp($needle,haystack.AT-POS($i))),
           Order::Less
         ),
         nqp::stmts(                                    # needle is less
@@ -70,7 +71,7 @@ my multi sub finds(@a, $needle, :&cmp = &[cmp]) {
           nqp::stmts(                                  # found needle
             nqp::while(                                # find first occurrence
               nqp::isge_i(($i = nqp::sub_i($i,1)),0)
-                && nqp::eqaddr(cmp($needle,@a.AT-POS($i)),Order::Same),
+                && nqp::eqaddr(cmp($needle,haystack.AT-POS($i)),Order::Same),
               nqp::null
             ),
             (return nqp::add_i($i,1))
@@ -83,28 +84,28 @@ my multi sub finds(@a, $needle, :&cmp = &[cmp]) {
     nqp::box_i($i,NotFound)
 }
 
-my multi sub inserts(@a, $needle, NotFound :$pos!) {
-    insert(@a, $pos, $needle)
+my multi sub inserts(\haystack, $needle, NotFound :$pos!) {
+    insert(haystack, $pos, $needle)
 }
 
-my multi sub inserts(@a, $needle, :&cmp = &[cmp], :$force) {
+my multi sub inserts(\haystack, $needle, :&cmp = &[cmp], :$force) {
     nqp::if(
-      nqp::istype((my $i := finds(@a, $needle, :&cmp)),NotFound),
+      nqp::istype((my $i := finds(haystack, $needle, :&cmp)),NotFound),
       nqp::stmts(                                       # not found
-        @a.splice($i,0,$needle),
+        insert(haystack, $i, $needle),
         nqp::box_i($i,Int)
       ),
       nqp::if(                                          # found
         $force,
         nqp::stmts(                                     # force insertion
           (my int $j = $i),
-          (my int $elems = @a.elems),
+          (my int $elems = haystack.elems),
           nqp::while(                                   # insert after last
             nqp::islt_i(($j = nqp::add_i($j,1)),$elems)
-              && nqp::eqaddr(cmp($needle,@a.AT-POS($j)),Order::Same),
+              && nqp::eqaddr(cmp($needle,haystack.AT-POS($j)),Order::Same),
             nqp::null
           ),
-          @a.splice($j,0,$needle),
+          insert(haystack, $j, $needle),
           $j
         ),
         Nil
@@ -112,34 +113,34 @@ my multi sub inserts(@a, $needle, :&cmp = &[cmp], :$force) {
     )
 }
 
-my multi sub inserts(@a, $needle, **@also, NotFound :$pos!) {
-    insert(@a, $pos, $needle);
+my multi sub inserts(\haystack, $needle, **@also, NotFound :$pos!) {
+    insert(haystack, $pos, $needle);
     insert-also($pos, @also)
 }
 
-my multi sub inserts(@a, $needle, **@also, :&cmp = &[cmp], :$force) {
-    nqp::eqaddr((my $i := inserts(@a, $needle, :&cmp, :$force)),Nil)
+my multi sub inserts(\haystack, $needle, **@also, :&cmp = &[cmp], :$force) {
+    nqp::eqaddr((my $i := inserts(haystack, $needle, :&cmp, :$force)),Nil)
       ?? $i
       !! insert-also($i, @also)
 }
 
-my multi sub deletes(@a, $needle, :&cmp = &[cmp]) {
+my multi sub deletes(\haystack, $needle, :&cmp = &[cmp]) {
     nqp::if(
-      nqp::istype((my $i := finds(@a, $needle, :&cmp)),NotFound),
+      nqp::istype((my $i := finds(haystack, $needle, :&cmp)),NotFound),
       Nil,
       nqp::stmts(
-        @a.splice($i,1),
+        delete(haystack, $i),
         $needle
       )
     )
 }
 
-my multi sub deletes(@a, $needle, **@also, :&cmp = &[cmp]) {
+my multi sub deletes(\haystack, $needle, **@also, :&cmp = &[cmp]) {
     nqp::if(
-      nqp::istype((my $i := finds(@a, $needle, :&cmp)),NotFound),
+      nqp::istype((my $i := finds(haystack, $needle, :&cmp)),NotFound),
       Nil,
       nqp::stmts(
-        @a.splice($i,1),
+        delete(haystack, $i),
         delete-also($i, @also),
         $needle
       )
@@ -173,11 +174,19 @@ my sub delete-also(Int:D $i, @also) {
     $i
 }
 
-my multi sub insert(@a, \pos, \value) {
-    @a.splice(pos,0,value)
+my multi sub insert(@a, $pos, \value) {
+    @a.splice($pos, 0, value);
+    $pos
 }
-my multi sub delete(@a, \pos) {
-    @a.splice(pos,1)
+my multi sub insert(IterationBuffer:D $buffer, $pos, \value) {
+    nqp::splice($buffer,nqp::list(value),$pos,0);
+    $pos
+}
+my multi sub delete(@a, $pos) {
+    @a.splice($pos, 1)
+}
+my multi sub delete(IterationBuffer:D $buffer, $pos) {
+    nqp::splice($buffer, $empty-list, $pos, 1)
 }
 
 #- start of generated part of str candidates -----------------------------------
