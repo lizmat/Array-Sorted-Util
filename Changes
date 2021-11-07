@@ -1,6 +1,8 @@
 Revision history for Array::Sorted::Util
 
 {{$NEXT}}
+
+0.0.8  2021-11-07T11:50:52+01:00
     - Transparently allow IterationBuffers to be used as haystacks
       as well.
 
