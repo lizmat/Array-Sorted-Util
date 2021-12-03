@@ -830,7 +830,7 @@ Array::Sorted::Util - Raku utilities for (native) sorted arrays
 
 =begin code :lang<raku>
 
-use Array::Sorted::Util;  # imports finds, inserts, deletes
+use Array::Sorted::Util;  # imports finds, inserts, deletes, nexts, prevs
 
 my @a;
 inserts(@a,$_) for <d c f e g h a b j i>;
@@ -846,8 +846,8 @@ say @a;               # [a b c d f g h i j]
 
 =head1 DESCRIPTION
 
-Array::Sorted::Util exports a set of subroutines that create and manipulate
-sorted arrays.
+Array::Sorted::Util exports a collection of subroutines that create,
+introspect and manipulate sorted arrays and optionally associated arrays.
 
 =head1 SUBROUTINES
 
@@ -866,7 +866,7 @@ inserts(@b, 'foo', @c, 'bar');  # multiple associated lists
 
 my @d = <a c e g i>;
 my $pos = finds(@d,"d");
-if $pos {
+with $pos {
     say "Found at $pos";
 }
 else {
@@ -916,7 +916,7 @@ say nexts(@a, "j");  # Nil
 Return the object B<after> the given object (the second argument) in the
 given sorted array (the first argument).  Takes a named argument C<cmp> to
 indicate the logic that should be used to determine order (defaults to
-C<infix:<cmp>>).  Returns Nil if no object could be found.
+C<infix:<cmp>>).  Returns C<Nil> if no object could be found.
 
 =head2 prevs
 
@@ -931,7 +931,7 @@ say prevs(@a, "a");  # Nil
 Return the object B<before> the given object (the second argument) in the
 given sorted array (the first argument).  Takes a named argument C<cmp> to
 indicate the logic that should be used to determine order (defaults to
-C<infix:<cmp>>).  Returns Nil if no object could be found.
+C<infix:<cmp>>).  Returns C<Nil> if no object could be found.
 
 =head2 deletes
 
@@ -952,11 +952,13 @@ the primary removed object.
 
 =head1 INSPIRATION
 
-The inspiration for these names is from the TUTOR Programming Language,
-which had C<finds>, C<inserts> and C<deletes> commands.
+The inspiration for the names of these subroutines came from the
+L<TUTOR Programming Language|https://en.wikipedia.org/wiki/TUTOR>, which
+had C<finds>, C<inserts> and C<deletes> commands, where the postfix C<s>
+indicated the B<sorted> version of these commands.
 
-See https://files.eric.ed.gov/fulltext/ED208879.pdf for more information
-(pages C16 and C17).
+The L<original manual|https://files.eric.ed.gov/fulltext/ED208879.pdf>
+contains more information, specifically pages C16 and C17.
 
 =head1 AUTHOR
 

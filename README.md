@@ -9,7 +9,7 @@ SYNOPSIS
 ========
 
 ```raku
-use Array::Sorted::Util;  # imports finds, inserts, deletes
+use Array::Sorted::Util;  # imports finds, inserts, deletes, nexts, prevs
 
 my @a;
 inserts(@a,$_) for <d c f e g h a b j i>;
@@ -25,7 +25,7 @@ say @a;               # [a b c d f g h i j]
 DESCRIPTION
 ===========
 
-Array::Sorted::Util exports a set of subroutines that create and manipulate sorted arrays.
+Array::Sorted::Util exports a collection of subroutines that create, introspect and manipulate sorted arrays and optionally associated arrays.
 
 SUBROUTINES
 ===========
@@ -45,7 +45,7 @@ inserts(@b, 'foo', @c, 'bar');  # multiple associated lists
 
 my @d = <a c e g i>;
 my $pos = finds(@d,"d");
-if $pos {
+with $pos {
     say "Found at $pos";
 }
 else {
@@ -78,7 +78,7 @@ say nexts(@a, "g");  # h
 say nexts(@a, "j");  # Nil
 ```
 
-Return the object **after** the given object (the second argument) in the given sorted array (the first argument). Takes a named argument `cmp` to indicate the logic that should be used to determine order (defaults to `infix:<cmp>`). Returns Nil if no object could be found.
+Return the object **after** the given object (the second argument) in the given sorted array (the first argument). Takes a named argument `cmp` to indicate the logic that should be used to determine order (defaults to `infix:<cmp>`). Returns `Nil` if no object could be found.
 
 prevs
 -----
@@ -89,7 +89,7 @@ say prevs(@a, "g");  # f
 say prevs(@a, "a");  # Nil
 ```
 
-Return the object **before** the given object (the second argument) in the given sorted array (the first argument). Takes a named argument `cmp` to indicate the logic that should be used to determine order (defaults to `infix:<cmp>`). Returns Nil if no object could be found.
+Return the object **before** the given object (the second argument) in the given sorted array (the first argument). Takes a named argument `cmp` to indicate the logic that should be used to determine order (defaults to `infix:<cmp>`). Returns `Nil` if no object could be found.
 
 deletes
 -------
@@ -105,9 +105,9 @@ Attempt to remove the given object (the second argument) from the given sorted a
 INSPIRATION
 ===========
 
-The inspiration for these names is from the TUTOR Programming Language, which had `finds`, `inserts` and `deletes` commands.
+The inspiration for the names of these subroutines came from the [TUTOR Programming Language](https://en.wikipedia.org/wiki/TUTOR), which had `finds`, `inserts` and `deletes` commands, where the postfix `s` indicated the **sorted** version of these commands.
 
-See https://files.eric.ed.gov/fulltext/ED208879.pdf for more information (pages C16 and C17).
+The [original manual](https://files.eric.ed.gov/fulltext/ED208879.pdf) contains more information, specifically pages C16 and C17.
 
 AUTHOR
 ======
