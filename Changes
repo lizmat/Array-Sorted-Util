@@ -2,6 +2,10 @@ Revision history for Array::Sorted::Util
 
 {{$NEXT}}
 
+0.0.10  2024-06-24T20:04:09+02:00
+    - Add sponsor link and button
+    - Update copyright year
+
 0.0.9  2021-12-03T19:42:05+01:00
     - Some pod tweaks and fixes
 
