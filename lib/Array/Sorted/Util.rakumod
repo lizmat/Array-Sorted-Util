@@ -887,6 +887,10 @@ Can also take an optional named argument C<pos> from a previously unsuccessful
 call to C<finds> as a shortcut to prevent needing to search for the object
 again.
 
+By default, will replace any existing object that matches.  The optional
+C<:force> named argument can be specified to insert the object after any
+existing object.
+
 =head2 finds
 
 =begin code :lang<raku>
