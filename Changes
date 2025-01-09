@@ -1,6 +1,8 @@
 Revision history for Array::Sorted::Util
 
 {{$NEXT}}
+
+0.0.11  2025-01-09T16:00:46+01:00
     - Add CI badge for each OS
     - Update copyright year
 
