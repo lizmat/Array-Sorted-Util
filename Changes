@@ -1,6 +1,8 @@
 Revision history for Array::Sorted::Util
 
 {{$NEXT}}
+    - Add CI badge for each OS
+    - Update copyright year
 
 0.0.10  2024-06-24T20:04:09+02:00
     - Add sponsor link and button
